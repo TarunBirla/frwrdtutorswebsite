@@ -33,6 +33,12 @@ const Tutors = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+const [approvedCount, setApprovedCount] = useState(0);
+const [pendingCount, setPendingCount] = useState(0);
+const [dormantCount, setDormantCount] = useState(0);
+const [rejectedCount, setRejectedCount] = useState(0);
 
   const fetchTutors = async (brand, page = 1) => {
     setLoading(true);
@@ -42,9 +48,16 @@ const Tutors = () => {
           ? "https://api.frwrdtutors.com/api/admin/all-tutorsBranch1017"
           : "https://api.frwrdtutors.com/api/admin/all-tutorsBranch28866";
       const { data } = await axios.get(`${base}?page=${page}`);
-      setTutors(data.tutors || []);
-      setTotalRecords(data.count || 0);
-      setCurrentPage(page);
+
+setTutors(data.tutors || []);
+setTotalRecords(data.count || 0);
+
+setApprovedCount(data.approvedCount || 0);
+setPendingCount(data.pendingCount || 0);
+setDormantCount(data.dormantCount || 0);
+setRejectedCount(data.rejectedCount || 0);
+
+setCurrentPage(page);
     } catch (err) {
       console.error(err);
       setTutors([]);
@@ -63,11 +76,19 @@ const Tutors = () => {
     fetchTutors(tab, 1);
   };
 
-  const filteredTutors = tutors.filter((tutor) =>
+ const filteredTutors = tutors.filter((tutor) => {
+  const searchMatch =
     `${tutor.first_name} ${tutor.last_name} ${tutor.email}`
       .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+      .includes(search.toLowerCase());
+
+  const statusMatch =
+    statusFilter === "all"
+      ? true
+      : tutor.status?.toLowerCase() === statusFilter;
+
+  return searchMatch && statusMatch;
+});
 
   const totalPages = Math.ceil(totalRecords / 100);
 
@@ -113,9 +134,90 @@ const Tutors = () => {
                 className="text-sm font-medium px-4 py-2 rounded-xl"
                 style={{ backgroundColor: "#3C3A8618", color: "#3C3A86" }}
               >
-                Total: {totalRecords.toLocaleString()} tutors
+                <div className="flex flex-wrap gap-2">
+
+  <div className="px-4 py-2 rounded-xl bg-[#3C3A8618] text-[#3C3A86] text-sm font-medium">
+    Total: {totalRecords}
+  </div>
+
+  <div className="px-4 py-2 rounded-xl bg-green-100 text-green-700 text-sm font-medium">
+    Active: {approvedCount}
+  </div>
+
+  <div className="px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 text-sm font-medium">
+    Pending: {pendingCount}
+  </div>
+
+  <div className="px-4 py-2 rounded-xl bg-red-100 text-red-700 text-sm font-medium">
+    Inactive: {dormantCount}
+  </div>
+
+  <div className="px-4 py-2 rounded-xl bg-gray-200 text-gray-700 text-sm font-medium">
+    Rejected: {rejectedCount}
+  </div>
+
+</div>
               </div>
             </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+
+  <button
+    onClick={() => setStatusFilter("all")}
+    className={`px-4 py-2 rounded-lg text-sm ${
+      statusFilter === "all"
+        ? "bg-[#3C3A86] text-white"
+        : "bg-gray-100"
+    }`}
+  >
+    All ({totalRecords})
+  </button>
+
+  <button
+    onClick={() => setStatusFilter("approved")}
+    className={`px-4 py-2 rounded-lg text-sm ${
+      statusFilter === "approved"
+        ? "bg-green-600 text-white"
+        : "bg-green-100 text-green-700"
+    }`}
+  >
+    Active ({approvedCount})
+  </button>
+
+  <button
+    onClick={() => setStatusFilter("pending")}
+    className={`px-4 py-2 rounded-lg text-sm ${
+      statusFilter === "pending"
+        ? "bg-yellow-500 text-white"
+        : "bg-yellow-100 text-yellow-700"
+    }`}
+  >
+    Pending ({pendingCount})
+  </button>
+
+  <button
+    onClick={() => setStatusFilter("dormant")}
+    className={`px-4 py-2 rounded-lg text-sm ${
+      statusFilter === "dormant"
+        ? "bg-red-600 text-white"
+        : "bg-red-100 text-red-700"
+    }`}
+  >
+    Inactive ({dormantCount})
+  </button>
+
+  <button
+    onClick={() => setStatusFilter("rejected")}
+    className={`px-4 py-2 rounded-lg text-sm ${
+      statusFilter === "rejected"
+        ? "bg-gray-700 text-white"
+        : "bg-gray-200 text-gray-700"
+    }`}
+  >
+    Rejected ({rejectedCount})
+  </button>
+
+</div>
 
             {/* Search */}
             <div className="mb-4">

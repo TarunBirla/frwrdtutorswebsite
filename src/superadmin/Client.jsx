@@ -25,6 +25,21 @@ const Clients = () => {
                 </span>
             ),
         },
+        // {
+        //     key: "status",
+        //     label: "Status",
+        //     render: (row) => (
+        //         <span
+        //             className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+        //                 row.status === "live"
+        //                     ? "bg-green-100 text-green-700"
+        //                     : "bg-red-100 text-red-700"
+        //             }`}
+        //         >
+        //             {row.status === "live" ? "Active" : "Inactive"}
+        //         </span>
+        //     ),
+        // },
         {
             key: "students",
             label: "Students",
@@ -50,18 +65,27 @@ const Clients = () => {
     const [selectedClient, setSelectedClient] = useState(null);
     const [studentSearch, setStudentSearch] = useState("");
     const [studentsLoading, setStudentsLoading] = useState(false);
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [activeCount, setActiveCount] = useState(0);
+    const [inactiveCount, setInactiveCount] = useState(0);
 
     const fetchClients = async (brand, page = 1) => {
         setLoading(true);
+
         try {
             const base =
                 brand === "JLT"
                     ? "https://api.frwrdtutors.com/api/admin/all-clientsBranch1017"
                     : "https://api.frwrdtutors.com/api/admin/all-clientsBranch28866";
+
             const { data } = await axios.get(`${base}?page=${page}`);
+
             setClients(data.clients || []);
             setTotalRecords(data.count || 0);
             setCurrentPage(page);
+
+            setActiveCount(data.activeCount || 0);
+            setInactiveCount(data.inactiveCount || 0);
         } catch (err) {
             console.error(err);
             setClients([]);
@@ -107,16 +131,26 @@ const Clients = () => {
         fetchClients(tab, 1);
     };
 
-    const filteredClients = clients.filter((client) =>
-        `${client.first_name} ${client.last_name} ${client.email}`
-            .toLowerCase()
-            .includes(search.toLowerCase())
-    );
+    const filteredClients = clients.filter((client) => {
+        const searchMatch =
+            `${client.first_name} ${client.last_name} ${client.email}`
+                .toLowerCase()
+                .includes(search.toLowerCase());
+
+        const statusMatch =
+            statusFilter === "all"
+                ? true
+                : statusFilter === "active"
+                  ? client.status === "live"
+                  : client.status === "dormant";
+
+        return searchMatch && statusMatch;
+    });
 
     const filteredStudents = students.filter((student) =>
         `${student.first_name} ${student.last_name} ${student.email}`
             .toLowerCase()
-            .includes(studentSearch.toLowerCase())
+            .includes(studentSearch.toLowerCase()),
     );
 
     const totalPages = Math.ceil(totalRecords / 100);
@@ -138,7 +172,9 @@ const Clients = () => {
                             <Users size={20} className="text-white" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-gray-800">Clients</h2>
+                            <h2 className="text-lg font-bold text-gray-800">
+                                Clients
+                            </h2>
                             <p className="text-sm text-gray-400">
                                 Manage all clients across branches
                             </p>
@@ -160,12 +196,61 @@ const Clients = () => {
                             </div>
                             <div
                                 className="text-sm font-medium px-4 py-2 rounded-xl"
-                                style={{ backgroundColor: "#3C3A8618", color: "#3C3A86" }}
+                                style={{
+                                    backgroundColor: "#3C3A8618",
+                                    color: "#3C3A86",
+                                }}
                             >
-                                Total: {totalRecords.toLocaleString()} clients
+                                <div className="flex gap-3 flex-wrap">
+                                    <div className="px-4 py-2 rounded-xl bg-[#3C3A8618] text-[#3C3A86] text-sm font-medium">
+                                        Total: {totalRecords}
+                                    </div>
+
+                                    <div className="px-4 py-2 rounded-xl bg-green-100 text-green-700 text-sm font-medium">
+                                        Active: {activeCount}
+                                    </div>
+
+                                    <div className="px-4 py-2 rounded-xl bg-red-100 text-red-700 text-sm font-medium">
+                                        Inactive: {inactiveCount}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
+                        <div className="flex gap-2 mb-4">
+                            <button
+                                onClick={() => setStatusFilter("all")}
+                                className={`px-4 py-2 rounded-lg text-sm ${
+                                    statusFilter === "all"
+                                        ? "bg-[#3C3A86] text-white"
+                                        : "bg-gray-100"
+                                }`}
+                            >
+                                All ({clients.length})
+                            </button>
+
+                            <button
+                                onClick={() => setStatusFilter("active")}
+                                className={`px-4 py-2 rounded-lg text-sm ${
+                                    statusFilter === "active"
+                                        ? "bg-green-600 text-white"
+                                        : "bg-green-100 text-green-700"
+                                }`}
+                            >
+                                Active ({activeCount})
+                            </button>
+
+                            <button
+                                onClick={() => setStatusFilter("inactive")}
+                                className={`px-4 py-2 rounded-lg text-sm ${
+                                    statusFilter === "inactive"
+                                        ? "bg-red-600 text-white"
+                                        : "bg-red-100 text-red-700"
+                                }`}
+                            >
+                                Inactive ({inactiveCount})
+                            </button>
+                        </div>
                         {/* Search */}
                         <div className="mb-4">
                             <input
@@ -198,7 +283,6 @@ const Clients = () => {
                 {studentsModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
                         <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh]">
-
                             {/* Modal Header */}
                             <div className="flex items-center justify-between p-6 border-b border-gray-100">
                                 <div className="flex items-center gap-3">
@@ -206,7 +290,10 @@ const Clients = () => {
                                         className="w-9 h-9 rounded-xl flex items-center justify-center"
                                         style={{ backgroundColor: "#3C3A86" }}
                                     >
-                                        <GraduationCap size={18} className="text-white" />
+                                        <GraduationCap
+                                            size={18}
+                                            className="text-white"
+                                        />
                                     </div>
                                     <div>
                                         <h2 className="text-lg font-bold text-gray-800">
@@ -250,34 +337,61 @@ const Clients = () => {
                                     <table className="w-full text-sm">
                                         <thead>
                                             <tr>
-                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-l-xl">ID</th>
-                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">First Name</th>
-                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">Last Name</th>
-                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-r-xl">Email</th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-l-xl">
+                                                    ID
+                                                </th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                    First Name
+                                                </th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                                                    Last Name
+                                                </th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 rounded-r-xl">
+                                                    Email
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {filteredStudents.map((student, index) => (
-                                                <tr
-                                                    key={student.id}
-                                                    className={`border-b border-gray-50 hover:bg-[#3C3A86]/5 transition-colors ${
-                                                        index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                                                    }`}
-                                                >
-                                                    <td className="py-3 px-4 text-gray-500 text-xs">{student.id}</td>
-                                                    <td className="py-3 px-4 font-medium text-gray-800">{student.first_name}</td>
-                                                    <td className="py-3 px-4 text-gray-700">{student.last_name}</td>
-                                                    <td className="py-3 px-4 text-gray-500">{student.email}</td>
-                                                </tr>
-                                            ))}
+                                            {filteredStudents.map(
+                                                (student, index) => (
+                                                    <tr
+                                                        key={student.id}
+                                                        className={`border-b border-gray-50 hover:bg-[#3C3A86]/5 transition-colors ${
+                                                            index % 2 === 0
+                                                                ? "bg-white"
+                                                                : "bg-gray-50/50"
+                                                        }`}
+                                                    >
+                                                        <td className="py-3 px-4 text-gray-500 text-xs">
+                                                            {student.id}
+                                                        </td>
+                                                        <td className="py-3 px-4 font-medium text-gray-800">
+                                                            {student.first_name}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-gray-700">
+                                                            {student.last_name}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-gray-500">
+                                                            {student.email}
+                                                        </td>
+                                                    </tr>
+                                                ),
+                                            )}
                                         </tbody>
                                     </table>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-                                        <GraduationCap size={40} className="mb-3 opacity-30" />
-                                        <p className="text-sm font-medium">No students found</p>
+                                        <GraduationCap
+                                            size={40}
+                                            className="mb-3 opacity-30"
+                                        />
+                                        <p className="text-sm font-medium">
+                                            No students found
+                                        </p>
                                         {studentSearch && (
-                                            <p className="text-xs mt-1">Try a different search term</p>
+                                            <p className="text-xs mt-1">
+                                                Try a different search term
+                                            </p>
                                         )}
                                     </div>
                                 )}

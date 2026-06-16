@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash, FaUserShield } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 
 const SuperAdminLogin = () => {
     const [email, setEmail] = useState("");
@@ -18,10 +20,16 @@ const SuperAdminLogin = () => {
         ) {
             localStorage.setItem("superAdminToken", "token123");
             localStorage.setItem("isSuperAdmin", "true");
-
+             toast.success("Login successful!", {
+                    position: "top-right",
+                    autoClose: 2000,
+                });
             navigate("/superadmin/dashboard");
         } else {
-            alert("Invalid Credentials");
+            toast.error("Invalid Credentials", {
+                                position: "top-right",
+                                autoClose: 2000,
+                            });
         }
     };
 

@@ -48,6 +48,11 @@ import Tutors from "./superadmin/Tutors";
 import Students from "./superadmin/Students";
 import Invoice from "./superadmin/Invoice";
 import Appointment from "./superadmin/Appointment";
+import StudentsDashboard from "./superadmin/Studentsdashboard";
+import TutorsDashboard from "./superadmin/tutorsdashboard";
+import InvoicesDashboard from "./superadmin/InvoicesDashboard";
+import PaymentsDashboard from "./superadmin/PaymentsDashboard";
+import AppointmentsDashboard from "./superadmin/AppointmentsDashboard";
 
 const GuestRoute = ({ children }) => {
     const token = localStorage.getItem("token");
@@ -418,6 +423,29 @@ const App = () => {
 <Route
   path="/superadmin/invoices"
   element={<Invoice />}
+/>
+<Route
+  path="/superadmin/students-dashboard"
+  element={<StudentsDashboard />}
+/>
+
+<Route
+  path="/superadmin/invoices-dashboard"
+  element={<InvoicesDashboard />}
+/>
+
+<Route
+  path="/superadmin/payments-dashboard"
+  element={<PaymentsDashboard />}
+/>
+<Route
+  path="/superadmin/appointments-dashboard"
+  element={<AppointmentsDashboard />}
+/>
+
+<Route
+  path="/superadmin/tutors-dashboard"
+  element={<TutorsDashboard />}
 />
 <Route
  path="/superadmin/appointments"
