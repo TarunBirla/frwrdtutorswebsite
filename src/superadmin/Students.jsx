@@ -15,15 +15,15 @@ const COLUMNS = [
   { key: "first_name", label: "First Name" },
   { key: "last_name", label: "Last Name" },
   { key: "email", label: "Email" },
-  {
-    key: "role_type",
-    label: "Role",
-    render: (row) => (
-      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#3C3A86]/10 text-[#3C3A86]">
-        {row.role_type}
-      </span>
-    ),
-  },
+  // {
+  //   key: "role_type",
+  //   label: "Role",
+  //   render: (row) => (
+  //     <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#3C3A86]/10 text-[#3C3A86]">
+  //       {row.role_type}
+  //     </span>
+  //   ),
+  // },
 ];
 
 const Students = () => {

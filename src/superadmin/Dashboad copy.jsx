@@ -425,55 +425,26 @@ const Dashboard = () => {
         },
     ];
 
-  const fillLast10Months = (dataObj) => {
-    const result = [];
-
-    const current = new Date();
-    current.setDate(1); // current month start
-
-    for (let i = 9; i >= 0; i--) {
-        const d = new Date(current);
-        d.setMonth(current.getMonth() - i);
-
-        const month = d.toISOString().slice(0, 7);
-
-        result.push({
-            month,
-            value: Number(dataObj?.[month] || 0),
-        });
-    }
-
-    return result;
-};
-
-    const studentTrendData = fillLast10Months(
-    dashboard.students?.monthlyStudentTrend
-);
-
-const tutorTrendData = fillLast10Months(
-    dashboard.tutors?.monthlyTutorTrend
-);
-
-const paymentsTrendData = fillLast10Months(
-    dashboard.payments?.paymentsByMonth
-);
-console.log("paymentsTrendData", paymentsTrendData);
+    const studentTrendData = Object.entries(
+        dashboard.students?.monthlyStudentTrend || {},
+    ).map(([month, value]) => ({ month, value }));
+    const tutorTrendData = Object.entries(
+        dashboard.tutors?.monthlyTutorTrend || {},
+    ).map(([month, value]) => ({ month, value }));
     const clientTrendData = Object.entries(
-    dashboard.clients?.monthlyClientTrend || {}
-)
-    .map(([month, value]) => ({ month, value }))
-    .sort((a, b) => new Date(a.month) - new Date(b.month))
-    .slice(-5);
+        dashboard.clients?.monthlyClientTrend || {},
+    ).map(([month, value]) => ({ month, value }));
     const appointmentTrend = Object.entries(
         dashboard.appointments?.monthlyLessonsTrend || {},
     ).map(([month, value]) => ({ month, value }));
-    
-   const lessonTopicsData = Object.entries(
-    dashboard.appointments?.lessonTopics || {}
-)
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value) // Highest first
-    .slice(0, 10);
+    const paymentsTrendData = Object.entries(
+        dashboard.payments?.paymentsByMonth || {},
+    ).map(([month, value]) => ({ month, value }));
+    const lessonTopicsData = Object.entries(
+        dashboard.appointments?.lessonTopics || {},
+    )
+        .slice(0, 10)
+        .map(([name, value]) => ({ name, value }));
 
     return (
         <div className="flex min-h-screen" style={{ background: "#F8F8FC" }}>
@@ -706,16 +677,15 @@ console.log("paymentsTrendData", paymentsTrendData);
                                                     strokeDasharray="3 3"
                                                     stroke="#F3F4F6"
                                                 />
-                                                 <XAxis
-    dataKey="month"
-    interval={0}
-    angle={-45}
-    textAnchor="end"
-    height={60}
-    tick={{ fontSize: 10, fill: GRAY }}
-    axisLine={false}
-    tickLine={false}
-/>
+                                                <XAxis
+                                                    dataKey="month"
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
                                                 <YAxis
                                                     tick={{
                                                         fontSize: 11,
@@ -753,16 +723,15 @@ console.log("paymentsTrendData", paymentsTrendData);
                                                     strokeDasharray="3 3"
                                                     stroke="#F3F4F6"
                                                 />
-                                                 <XAxis
-    dataKey="month"
-    interval={0}
-    angle={-45}
-    textAnchor="end"
-    height={60}
-    tick={{ fontSize: 10, fill: GRAY }}
-    axisLine={false}
-    tickLine={false}
-/>
+                                                <XAxis
+                                                    dataKey="month"
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
                                                 <YAxis
                                                     tick={{
                                                         fontSize: 11,
@@ -854,16 +823,15 @@ console.log("paymentsTrendData", paymentsTrendData);
                                                     strokeDasharray="3 3"
                                                     stroke="#F3F4F6"
                                                 />
-     <XAxis
-    dataKey="month"
-    interval={0}
-    angle={-45}
-    textAnchor="end"
-    height={60}
-    tick={{ fontSize: 10, fill: GRAY }}
-    axisLine={false}
-    tickLine={false}
-/>
+                                                <XAxis
+                                                    dataKey="month"
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
                                                 <YAxis
                                                     tick={{
                                                         fontSize: 11,

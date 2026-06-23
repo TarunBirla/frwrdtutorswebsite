@@ -30,10 +30,21 @@ const Sidebar = () => {
     path: "/superadmin/dashboard",
   },
 
-  {
+  
+
+   {
     name: "Clients",
     icon: <Users size={20} />,
-    path: "/superadmin/clients",
+    children: [
+      {
+        name: "Dashboard",
+        path: "/superadmin/clients-dashboard",
+      },
+      {
+        name: "Clients",
+        path: "/superadmin/clients",
+      },
+    ],
   },
 
   {

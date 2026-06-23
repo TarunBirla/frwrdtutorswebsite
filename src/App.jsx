@@ -53,6 +53,7 @@ import TutorsDashboard from "./superadmin/tutorsdashboard";
 import InvoicesDashboard from "./superadmin/InvoicesDashboard";
 import PaymentsDashboard from "./superadmin/PaymentsDashboard";
 import AppointmentsDashboard from "./superadmin/AppointmentsDashboard";
+import ClientsDashboard from "./superadmin/Clientsdashboard";
 
 const GuestRoute = ({ children }) => {
     const token = localStorage.getItem("token");
@@ -427,6 +428,10 @@ const App = () => {
 <Route
   path="/superadmin/students-dashboard"
   element={<StudentsDashboard />}
+/>
+<Route
+  path="/superadmin/clients-dashboard"
+  element={<ClientsDashboard />}
 />
 
 <Route

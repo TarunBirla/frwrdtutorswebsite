@@ -2,429 +2,741 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-
 import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    Legend,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    LineChart,
+    Line,
 } from "recharts";
+import {
+    CalendarDays,
+    CheckCircle,
+    Clock3,
+    XCircle,
+    TrendingUp,
+    Monitor,
+    MapPin,
+    Timer,
+} from "lucide-react";
 
+// ─── Theme ───────────────────────────────────────────────
 const BRAND = "#3C3A86";
-const BRAND_DARK = "#2E2C68";
-const BRAND_SOFT = "#EDEBFB";
+const BRAND_LIGHT = "#EEEDFE";
+const GRAY = "#6B7280";
+const WHITE = "#ffffff";
+
+const COLORS = [
+    "#3C3A86",
+    "#10B981",
+    "#EF4444",
+    "#F59E0B",
+    "#06B6D4",
+    "#8B5CF6",
+];
 
 const STATUS_COLORS = {
-  completed: "#16A34A",
-  planned: "#3C3A86",
-  cancelled: "#DC2626",
-  pending: "#F59E0B",
-  rescheduled: "#6366F1",
+    completed: "#10B981",
+    planned: "#3C3A86",
+    cancelled: "#EF4444",
+    pending: "#F59E0B",
+    rescheduled: "#8B5CF6",
 };
-
-const FALLBACK_COLORS = ["#3C3A86", "#16A34A", "#F59E0B", "#DC2626", "#6366F1", "#0EA5A4"];
 
 const getStatusColor = (name, index) => {
-  const key = String(name || "").toLowerCase();
-  return STATUS_COLORS[key] || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+    const key = String(name || "").toLowerCase();
+    return STATUS_COLORS[key] || COLORS[index % COLORS.length];
 };
 
-/* ---------- Small UI atoms ---------- */
+// ─── Card meta ───────────────────────────────────────────
+const CARD_META = {
+    "Total Appointments": {
+        icon: CalendarDays,
+        bg: "#EEF2FF",
+        color: "#4338CA",
+    },
+    Completed: { icon: CheckCircle, bg: "#ECFDF5", color: "#059669" },
+    Planned: { icon: Clock3, bg: "#EEF2FF", color: "#4338CA" },
+    Cancelled: { icon: XCircle, bg: "#FEF2F2", color: "#DC2626" },
+    "Completion Rate": { icon: TrendingUp, bg: "#F5F3FF", color: "#7C3AED" },
+    "Online Lessons": { icon: Monitor, bg: "#ECFEFF", color: "#0891B2" },
+    "Offline Lessons": { icon: MapPin, bg: "#FFF7ED", color: "#EA580C" },
+    "Avg Lesson Duration": { icon: Timer, bg: "#ECFDF5", color: "#059669" },
+};
 
-const Spinner = () => (
-  <div className="flex flex-col items-center justify-center gap-3 py-24">
+// ─── Reusable Components ─────────────────────────────────
+const SectionCard = ({ title, subtitle, children, className = "" }) => (
     <div
-      className="w-10 h-10 rounded-full border-4 border-[#E7E5F7] animate-spin"
-      style={{ borderTopColor: BRAND }}
-    />
-    <p className="text-sm text-gray-400">Fetching dashboard data…</p>
-  </div>
+        className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-5 ${className}`}
+    >
+        {title && (
+            <div className="flex items-center gap-2 mb-4">
+                <div
+                    style={{
+                        width: 4,
+                        height: 20,
+                        borderRadius: 2,
+                        background: BRAND,
+                    }}
+                />
+                <div>
+                    <h3 className="font-semibold text-gray-800 text-base leading-tight">
+                        {title}
+                    </h3>
+                    {subtitle && (
+                        <p className="text-xs mt-0.5" style={{ color: GRAY }}>
+                            {subtitle}
+                        </p>
+                    )}
+                </div>
+            </div>
+        )}
+        {children}
+    </div>
 );
 
-const Card = ({ title, value, icon, accent = false }) => (
-  <div
-    className={`relative overflow-hidden rounded-2xl p-5 border transition-shadow hover:shadow-md ${
-      accent ? "text-white" : "bg-white border-gray-100"
-    }`}
-    style={accent ? { backgroundColor: BRAND } : {}}
-  >
-    <div className="flex items-start justify-between">
-      <div>
-        <p className={`text-xs font-medium uppercase tracking-wide ${accent ? "text-white/70" : "text-gray-400"}`}>
-          {title}
-        </p>
-        <h3 className={`text-2xl font-bold mt-2 ${accent ? "text-white" : "text-gray-900"}`}>
-          {value ?? "—"}
-        </h3>
-      </div>
-
-      {icon && (
+const StatCard = ({ title, value }) => {
+    const meta = CARD_META[title] || {
+        icon: CalendarDays,
+        bg: "#F3F4F6",
+        color: GRAY,
+    };
+    const Icon = meta.icon;
+    return (
         <div
-          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-            accent ? "bg-white/15" : ""
-          }`}
-          style={!accent ? { backgroundColor: BRAND_SOFT, color: BRAND } : {}}
+            className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-3 hover:shadow-md transition-all"
+            style={{ boxShadow: "0 1px 6px rgba(60,58,134,0.07)" }}
         >
-          {icon}
+            <div className="flex items-center justify-between">
+                <span
+                    className="text-xs font-medium uppercase tracking-wider"
+                    style={{ color: GRAY }}
+                >
+                    {title}
+                </span>
+                <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: meta.bg }}
+                >
+                    <Icon size={20} strokeWidth={2.2} color={meta.color} />
+                </div>
+            </div>
+            <div className="text-xl font-bold" style={{ color: meta.color }}>
+                {value ?? "—"}
+            </div>
         </div>
-      )}
-    </div>
+    );
+};
 
-    {accent && (
-      <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/10" />
-    )}
-  </div>
-);
-
-const SectionHeader = ({ title, subtitle }) => (
-  <div className="mb-5 flex items-center gap-3">
-    <span className="w-1.5 h-6 rounded-full" style={{ backgroundColor: BRAND }} />
-    <div>
-      <h2 className="font-bold text-base text-gray-900">{title}</h2>
-      {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
-    </div>
-  </div>
-);
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div
+                style={{
+                    background: WHITE,
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 10,
+                    padding: "8px 14px",
+                    fontSize: 13,
+                    color: "#1F2937",
+                    boxShadow: "0 4px 16px rgba(60,58,134,0.10)",
+                }}
+            >
+                <p className="text-xs text-gray-500 mb-1">
+                    {label ?? payload[0]?.payload?.name}
+                </p>
+                <p className="font-semibold" style={{ color: BRAND }}>
+                    {payload[0].value?.toLocaleString()}
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
 
 const StatusBadge = ({ status }) => {
-  const color = getStatusColor(status, 0);
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-      style={{ backgroundColor: `${color}1A`, color }}
-    >
-      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-      {status}
-    </span>
-  );
+    const color = getStatusColor(status, 0);
+    return (
+        <span
+            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
+            style={{ background: `${color}1A`, color }}
+        >
+            <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: color }}
+            />
+            {status}
+        </span>
+    );
 };
 
-const CustomTooltip = ({ active, payload }) => {
-  if (!active || !payload?.length) return null;
-  const item = payload[0];
-  return (
-    <div className="bg-white border border-gray-100 shadow-lg rounded-xl px-3 py-2 text-sm">
-      <p className="font-semibold text-gray-900">{item.name ?? item.payload?.name}</p>
-      <p style={{ color: item.color || BRAND }} className="font-medium">
-        {item.value}
-      </p>
+const EmptyState = ({ text = "No data available" }) => (
+    <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+        <svg
+            width="40"
+            height="40"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="mb-2 opacity-40"
+        >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+        </svg>
+        <span className="text-sm">{text}</span>
     </div>
-  );
-};
-
-/* ---------- Icons (inline, no extra deps) ---------- */
-
-const IconCalendar = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="4" width="18" height="18" rx="2" />
-    <path d="M16 2v4M8 2v4M3 10h18" />
-  </svg>
-);
-const IconCheck = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M20 6 9 17l-5-5" />
-  </svg>
-);
-const IconClock = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 3" />
-  </svg>
-);
-const IconX = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M18 6 6 18M6 6l12 12" />
-  </svg>
-);
-const IconTrend = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 17l6-6 4 4 8-8" />
-    <path d="M21 7v6h-6" />
-  </svg>
 );
 
-/* ---------- Main component ---------- */
-
+// ─── Main Component ──────────────────────────────────────
 const AppointmentsDashboard = () => {
-  const [activeTab, setActiveTab] = useState("JLT");
-  const [dashboard, setDashboard] = useState(null);
-  const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState("JLT");
+    const [loading, setLoading] = useState(false);
+    const [dashboard, setDashboard] = useState(null);
 
-  const fetchDashboard = async (branch) => {
-    setLoading(true);
+    const fetchDashboard = async (branch) => {
+        try {
+            setLoading(true);
+            const branchId = branch === "JLT" ? "1017" : "28866";
+            const { data } = await axios.get(
+                `https://api.frwrdtutors.com/api/admin/dashboardAppointmentsBranch${branchId}`,
+            );
+            setDashboard(data);
+            setActiveTab(branch);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    try {
-      const url =
-        branch === "JLT"
-          ? "https://api.frwrdtutors.com/api/admin/dashboardAppointmentsBranch1017"
-          : "https://api.frwrdtutors.com/api/admin/dashboardAppointmentsBranch28866";
+    useEffect(() => {
+        fetchDashboard("JLT");
+    }, []);
 
-      const { data } = await axios.get(url);
-      setDashboard(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ── Derived data ──
+    const statusData = dashboard
+        ? [
+              {
+                  name: "Completed",
+                  value: dashboard.overview?.completedLessons || 0,
+              },
+              {
+                  name: "Planned",
+                  value: dashboard.overview?.plannedLessons || 0,
+              },
+              {
+                  name: "Cancelled",
+                  value: dashboard.overview?.cancelledLessons || 0,
+              },
+          ]
+        : [];
 
-  useEffect(() => {
-    fetchDashboard("JLT");
-  }, []);
+    const topicData = dashboard
+        ? Object.entries(dashboard.lessonTopics || {})
+              .map(([name, value]) => ({ name, value }))
+              .sort((a, b) => b.value - a.value)
+              .slice(0, 15)
+        : [];
 
-  const handleTabChange = (tab) => {
-    if (tab === activeTab) return;
-    setActiveTab(tab);
-    fetchDashboard(tab);
-  };
+    const allTopics = dashboard
+        ? Object.entries(dashboard.lessonTopics || {}).sort(
+              (a, b) => b[1] - a[1],
+          )
+        : [];
 
-  const statusData = dashboard
-    ? Object.entries(dashboard.statusDistribution || {}).map(([name, value]) => ({ name, value }))
-    : [];
+    const monthlyTrendData = dashboard
+        ? Object.entries(dashboard.monthlyLessonsTrend || {}).map(
+              ([month, value]) => ({ month, value }),
+          )
+        : [];
 
-  const topicData = dashboard
-    ? Object.entries(dashboard.lessonTopics || {})
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 15)
-    : [];
+    const cards = dashboard
+        ? [
+              {
+                  title: "Total Appointments",
+                  value: dashboard.overview?.totalAppointments,
+              },
+              {
+                  title: "Completed",
+                  value: dashboard.overview?.completedLessons,
+              },
+              { title: "Planned", value: dashboard.overview?.plannedLessons },
+              {
+                  title: "Cancelled",
+                  value: dashboard.overview?.cancelledLessons,
+              },
+              {
+                  title: "Completion Rate",
+                  value:
+                      dashboard.overview?.completionRate != null
+                          ? `${dashboard.overview.completionRate}%`
+                          : "—",
+              },
+              {
+                  title: "Online Lessons",
+                  value: dashboard.overview?.onlineLessons,
+              },
+              {
+                  title: "Offline Lessons",
+                  value: dashboard.overview?.offlineLessons,
+              },
+              {
+                  title: "Avg Lesson Duration",
+                  value: `${dashboard.overview?.averageLessonDuration ?? 0} Hrs`,
+              },
+          ]
+        : [];
 
-  const allTopics = dashboard
-    ? Object.entries(dashboard.lessonTopics || {}).sort((a, b) => b[1] - a[1])
-    : [];
-
-  return (
-    <div className="flex bg-white min-h-screen">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-
-        <main className="p-6 lg:p-8 bg-white">
-          {/* HEADER */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Appointments dashboard</h1>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4 mb-6">
-  <h3 className="font-semibold text-blue-900 mb-2">
-    Dashboard Data Range
-  </h3>
-
-  <p className="text-sm text-blue-800">
-    To improve dashboard performance and prevent API rate limit
-    issues, appointment data is limited to:
-  </p>
-
-  <p className="font-semibold text-blue-900 mt-2">
-    Past 3 Months ← Today → Next 3 Months
-  </p>
-
-  <ul className="list-disc ml-5 mt-2 text-sm text-blue-800">
-    <li>Previous 3 months appointment history</li>
-    <li>Today's appointments</li>
-    <li>Upcoming 3 months appointments</li>
-  </ul>
-</div>
-            </div>
-
-            <div className="inline-flex bg-gray-100 rounded-xl p-1 self-start sm:self-auto">
-              {["JLT", "MTC"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => handleTabChange(tab)}
-                  className="px-5 py-2 rounded-lg text-sm font-semibold transition-colors duration-150"
-                  style={
-                    activeTab === tab
-                      ? { backgroundColor: BRAND, color: "#fff" }
-                      : { color: "#6B7280" }
-                  }
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {loading ? (
-            <Spinner />
-          ) : dashboard ? (
-            <>
-              {/* KPI CARDS */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                <Card
-                  title="Total appointments"
-                  value={dashboard.overview?.totalAppointments}
-                  icon={<IconCalendar />}
-                  accent
-                />
-                <Card
-                  title="Completed"
-                  value={dashboard.overview?.completedAppointments}
-                  icon={<IconCheck />}
-                />
-                <Card
-                  title="Planned"
-                  value={dashboard.overview?.plannedAppointments}
-                  icon={<IconClock />}
-                />
-                <Card
-                  title="Cancelled"
-                  value={dashboard.overview?.cancelledAppointments}
-                  icon={<IconX />}
-                />
-                <Card
-                  title="Completion rate"
-                  value={
-                    dashboard.overview?.completionRate != null
-                      ? `${dashboard.overview.completionRate}%`
-                      : "—"
-                  }
-                  icon={<IconTrend />}
-                />
-              </div>
-
-              {/* CHARTS */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {/* STATUS PIE */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                  <SectionHeader title="Appointment status" subtitle="Distribution across all statuses" />
-
-                  <ResponsiveContainer width="100%" height={320}>
-                    <PieChart>
-                      <Pie
-                        data={statusData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={70}
-                        outerRadius={110}
-                        paddingAngle={2}
-                        stroke="#fff"
-                        strokeWidth={2}
-                      >
-                        {statusData.map((item, index) => (
-                          <Cell key={item.name} fill={getStatusColor(item.name, index)} />
-                        ))}
-                      </Pie>
-
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend
-                        iconType="circle"
-                        wrapperStyle={{ fontSize: 13, color: "#6B7280" }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-
-                {/* TOP SUBJECTS */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                  <SectionHeader title="Top 15 lesson topics" subtitle="Ranked by total lessons booked" />
-
-                  <ResponsiveContainer width="100%" height={320}>
-                    <BarChart data={topicData} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F1F6" />
-
-                      <XAxis
-                        dataKey="name"
-                        angle={-35}
-                        textAnchor="end"
-                        interval={0}
-                        height={90}
-                        tick={{ fontSize: 11, fill: "#9CA3AF" }}
-                        axisLine={{ stroke: "#E5E7EB" }}
-                        tickLine={false}
-                      />
-
-                      <YAxis tick={{ fontSize: 12, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-
-                      <Tooltip content={<CustomTooltip />} cursor={{ fill: BRAND_SOFT }} />
-
-                      <Bar dataKey="value" fill={BRAND} radius={[6, 6, 0, 0]} maxBarSize={36} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* SUBJECT TABLE */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8">
-                <SectionHeader title="Top lesson topics" subtitle="Top 15 ranked breakdown" />
-
-                <div className="overflow-x-auto rounded-xl border border-gray-100">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr style={{ backgroundColor: BRAND_SOFT }}>
-                        <th className="p-3 text-left font-semibold text-gray-700 w-20">Rank</th>
-                        <th className="p-3 text-left font-semibold text-gray-700">Lesson topic</th>
-                        <th className="p-3 text-left font-semibold text-gray-700 w-40">Total lessons</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {topicData.map((item, index) => (
-                        <tr
-                          key={item.name}
-                          className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
-                        >
-                          <td className="p-3">
-                            <span
-                              className="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold"
-                              style={{ backgroundColor: BRAND_SOFT, color: BRAND }}
+    return (
+        <div className="flex min-h-screen" style={{ background: "#F8F8FC" }}>
+            <Sidebar />
+            <div className="flex-1 min-w-0">
+                <Navbar />
+                <div className="px-6 py-5">
+                    {/* ── Header ── */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p
+                                className="text-xs font-medium uppercase tracking-widest mb-1"
+                                style={{ color: GRAY }}
                             >
-                              {index + 1}
-                            </span>
-                          </td>
-                          <td className="p-3 font-medium text-gray-800">{item.name}</td>
-                          <td className="p-3 text-gray-600">{item.value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                                Appointments Overview
+                            </p>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                {activeTab} — Appointments Dashboard
+                            </h1>
+                        </div>
+                        <div
+                            className="flex p-1 rounded-xl"
+                            style={{
+                                background: BRAND_LIGHT,
+                                border: "1px solid #CECBF6",
+                            }}
+                        >
+                            {["JLT", "MTC"].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => fetchDashboard(tab)}
+                                    className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+                                    style={
+                                        activeTab === tab
+                                            ? {
+                                                  background: BRAND,
+                                                  color: WHITE,
+                                                  boxShadow:
+                                                      "0 2px 8px rgba(60,58,134,0.25)",
+                                              }
+                                            : {
+                                                  background: "transparent",
+                                                  color: BRAND,
+                                              }
+                                    }
+                                >
+                                    {tab} Branch
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ── Data Range Info Banner ── */}
+                    {/* <div
+                        className="rounded-2xl border border-blue-100 p-4 mb-6"
+                        style={{ background: "#EFF6FF" }}
+                    >
+                        <p className="text-sm font-semibold text-blue-800 mb-1">
+                            Dashboard Data Range
+                        </p>
+                        <p className="text-xs text-blue-700">
+                            Data is limited to{" "}
+                            <strong>
+                                Past 3 months ← Today → Next 3 months
+                            </strong>{" "}
+                            to optimize performance and avoid API rate limits.
+                        </p>
+                    </div> */}
+
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-32 gap-4">
+                            <div
+                                className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
+                                style={{
+                                    borderColor: BRAND_LIGHT,
+                                    borderTopColor: BRAND,
+                                }}
+                            />
+                            <p className="text-sm" style={{ color: GRAY }}>
+                                Loading appointments data…
+                            </p>
+                        </div>
+                    ) : dashboard ? (
+                        <>
+                            {/* ── Stat Cards ── */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                                {cards.map((c, i) => (
+                                    <StatCard
+                                        key={i}
+                                        title={c.title}
+                                        value={c.value}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* ── Row 1: Status Pie + Top 15 Topics Bar ── */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+                                <SectionCard
+                                    title="Appointment Status"
+                                    subtitle="Distribution across all statuses"
+                                >
+                                    {statusData.every((d) => d.value === 0) ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <PieChart>
+                                                <Pie
+                                                    data={statusData}
+                                                    dataKey="value"
+                                                    nameKey="name"
+                                                    outerRadius={100}
+                                                    innerRadius={50}
+                                                    paddingAngle={3}
+                                                    stroke={WHITE}
+                                                    strokeWidth={2}
+                                                >
+                                                    {statusData.map(
+                                                        (item, i) => (
+                                                            <Cell
+                                                                key={i}
+                                                                fill={getStatusColor(
+                                                                    item.name,
+                                                                    i,
+                                                                )}
+                                                            />
+                                                        ),
+                                                    )}
+                                                </Pie>
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                />
+                                                <Legend
+                                                    iconType="circle"
+                                                    iconSize={8}
+                                                    wrapperStyle={{
+                                                        fontSize: 12,
+                                                        color: GRAY,
+                                                    }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+
+                                <SectionCard
+                                    title="Top 15 Lesson Topics"
+                                    subtitle="Ranked by total lessons booked"
+                                >
+                                    {topicData.length === 0 ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <BarChart
+                                                data={topicData}
+                                                barSize={14}
+                                                margin={{
+                                                    top: 4,
+                                                    right: 8,
+                                                    bottom: 60,
+                                                    left: 0,
+                                                }}
+                                            >
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    stroke="#F3F4F6"
+                                                    vertical={false}
+                                                />
+                                                <XAxis
+                                                    dataKey="name"
+                                                    tick={{
+                                                        fontSize: 10,
+                                                        fill: GRAY,
+                                                    }}
+                                                    angle={-35}
+                                                    textAnchor="end"
+                                                    interval={0}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                    cursor={{ fill: "#F3F4F6" }}
+                                                />
+                                                <Bar
+                                                    dataKey="value"
+                                                    fill={BRAND}
+                                                    radius={[5, 5, 0, 0]}
+                                                    maxBarSize={32}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+                            </div>
+
+                            {/* ── Row 2: Monthly Trend + Top 5 Topics Table ── */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+                                <SectionCard
+                                    title="Monthly Lessons Trend"
+                                    subtitle="Lessons trend by month"
+                                >
+                                    {monthlyTrendData.length === 0 ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <BarChart
+                                                data={monthlyTrendData}
+                                                barSize={20}
+                                                margin={{
+                                                    top: 4,
+                                                    right: 8,
+                                                    bottom: 20,
+                                                    left: 0,
+                                                }}
+                                            >
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    stroke="#F3F4F6"
+                                                    vertical={false}
+                                                />
+                                                <XAxis
+                                                    dataKey="month"
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                    cursor={{ fill: "#F3F4F6" }}
+                                                />
+                                                <Bar
+                                                    dataKey="value"
+                                                    name="Lessons"
+                                                    fill={BRAND}
+                                                    radius={[5, 5, 0, 0]}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+
+                                <SectionCard
+                                    title="Top 5 Lesson Topics"
+                                    subtitle="Ranked breakdown"
+                                >
+                                    {topicData.length === 0 ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-sm">
+                                                <thead>
+                                                    <tr
+                                                        style={{
+                                                            borderBottom:
+                                                                "1px solid #F3F4F6",
+                                                        }}
+                                                    >
+                                                        {[
+                                                            "Rank",
+                                                            "Topic",
+                                                            "Total Lessons",
+                                                        ].map((h) => (
+                                                            <th
+                                                                key={h}
+                                                                className="pb-3 text-left font-medium"
+                                                                style={{
+                                                                    color: GRAY,
+                                                                    fontSize: 11,
+                                                                    textTransform:
+                                                                        "uppercase",
+                                                                    letterSpacing:
+                                                                        "0.05em",
+                                                                }}
+                                                            >
+                                                                {h}
+                                                            </th>
+                                                        ))}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {topicData
+                                                        .slice(0, 5)
+                                                        .map((item, i) => (
+                                                            <tr
+                                                                key={item.name}
+                                                                style={{
+                                                                    borderBottom:
+                                                                        "1px solid #F9FAFB",
+                                                                }}
+                                                                className="hover:bg-gray-50 transition-colors"
+                                                            >
+                                                                <td className="py-3">
+                                                                    <span
+                                                                        className="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold"
+                                                                        style={{
+                                                                            background:
+                                                                                BRAND_LIGHT,
+                                                                            color: BRAND,
+                                                                        }}
+                                                                    >
+                                                                        {i + 1}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="py-3 font-medium text-gray-800">
+                                                                    {item.name}
+                                                                </td>
+                                                                <td
+                                                                    className="py-3 font-semibold"
+                                                                    style={{
+                                                                        color: BRAND,
+                                                                    }}
+                                                                >
+                                                                    {item.value?.toLocaleString()}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </SectionCard>
+                            </div>
+
+                            {/* ── Row 3: All Topics Table (full width, scrollable) ── */}
+                            <SectionCard
+                                title="All Lesson Topics"
+                                subtitle={`${allTopics.length} topics total`}
+                            >
+                                {allTopics.length === 0 ? (
+                                    <EmptyState />
+                                ) : (
+                                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto rounded-xl border border-gray-100">
+                                        <table className="w-full text-sm">
+                                            <thead
+                                                className="sticky top-0 z-10"
+                                                style={{ background: WHITE }}
+                                            >
+                                                <tr
+                                                    style={{
+                                                        borderBottom:
+                                                            "2px solid #F3F4F6",
+                                                    }}
+                                                >
+                                                    {[
+                                                        "#",
+                                                        "Topic",
+                                                        "Lessons",
+                                                    ].map((h) => (
+                                                        <th
+                                                            key={h}
+                                                            className="px-4 py-3 text-left font-medium"
+                                                            style={{
+                                                                color: GRAY,
+                                                                fontSize: 11,
+                                                                textTransform:
+                                                                    "uppercase",
+                                                                letterSpacing:
+                                                                    "0.05em",
+                                                            }}
+                                                        >
+                                                            {h}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {allTopics.slice(0, 10).map(
+                                                    ([topic, count], i) => (
+                                                        <tr
+                                                            key={topic}
+                                                            style={{
+                                                                borderBottom:
+                                                                    "1px solid #F9FAFB",
+                                                            }}
+                                                            className="hover:bg-gray-50 transition-colors"
+                                                        >
+                                                            <td
+                                                                className="px-4 py-2.5 text-xs font-mono"
+                                                                style={{
+                                                                    color: GRAY,
+                                                                }}
+                                                            >
+                                                                {i + 1}
+                                                            </td>
+                                                            <td className="px-4 py-2.5 font-medium text-gray-800">
+                                                                {topic}
+                                                            </td>
+                                                            <td
+                                                                className="px-4 py-2.5 font-semibold"
+                                                                style={{
+                                                                    color: BRAND,
+                                                                }}
+                                                            >
+                                                                {count?.toLocaleString()}
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </SectionCard>
+                        </>
+                    ) : (
+                        <EmptyState text="Failed to load data. Please try again." />
+                    )}
                 </div>
-              </div>
-
-              {/* ALL SUBJECTS */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                <SectionHeader title="All lesson topics" subtitle={`${allTopics.length} topics total`} />
-
-                <div className="overflow-x-auto max-h-[600px] rounded-xl border border-gray-100">
-                  <table className="w-full text-sm">
-                    <thead className="sticky top-0">
-                      <tr style={{ backgroundColor: BRAND_SOFT }}>
-                        <th className="p-3 text-left font-semibold text-gray-700">Topic</th>
-                        <th className="p-3 text-left font-semibold text-gray-700 w-32">Lessons</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {allTopics.map(([topic, count], index) => (
-                        <tr key={topic} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                          <td className="p-3 text-gray-800">{topic}</td>
-                          <td className="p-3 font-medium" style={{ color: BRAND_DARK }}>
-                            {count}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-              <p className="font-medium">No data available</p>
-              <p className="text-sm mt-1">Try switching branches or refreshing the page.</p>
             </div>
-          )}
-        </main>
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default AppointmentsDashboard;

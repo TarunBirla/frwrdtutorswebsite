@@ -3,350 +3,845 @@ import axios from "axios";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Legend,
+    LineChart,
+    Line,
 } from "recharts";
+import {
+    UserCheck,
+    Clock3,
+    UserX,
+    UserPlus,
+    Star,
+    TrendingUp,
+    CircleDollarSign,
+    Percent,
+    Users,
+    BadgeCheck,
+} from "lucide-react";
 
+// ─── Theme ───────────────────────────────────────────────
 const BRAND = "#3C3A86";
-const BRAND_LIGHT = "#EBEBF8";
-const COLORS = ["#3C3A86", "#10B981", "#F59E0B", "#EF4444"];
+const BRAND_LIGHT = "#EEEDFE";
+const GRAY = "#6B7280";
+const WHITE = "#ffffff";
+const COLORS = [
+    "#3C3A86",
+    "#10B981",
+    "#F59E0B",
+    "#EF4444",
+    "#06B6D4",
+    "#8B5CF6",
+];
 
-const StatCard = ({ title, value, accent }) => (
-  <div
-    style={{
-      background: accent ? BRAND : "#fff",
-      color: accent ? "#fff" : "#111827",
-      border: `1px solid ${accent ? BRAND : "#E5E7EB"}`,
-    }}
-    className="rounded-2xl p-5 shadow-sm flex flex-col gap-1 transition-all hover:shadow-md"
-  >
-    <p className="text-xs font-semibold uppercase tracking-widest opacity-60">
-      {title}
-    </p>
-    <h3 className="text-2xl font-extrabold mt-1">{value ?? "—"}</h3>
-  </div>
-);
+// ─── Card meta ───────────────────────────────────────────
+const CARD_META = {
+    "Total Tutors": { icon: Users, bg: "#EEF2FF", color: "#4338CA" },
+    Approved: { icon: BadgeCheck, bg: "#ECFDF5", color: "#059669" },
+    Pending: { icon: Clock3, bg: "#FFF7ED", color: "#EA580C" },
+    Dormant: { icon: UserX, bg: "#F3F4F6", color: "#6B7280" },
+    Rejected: { icon: UserX, bg: "#FEF2F2", color: "#DC2626" },
+    "New Tutors This Month": {
+        icon: UserPlus,
+        bg: "#FFF7ED",
+        color: "#EA580C",
+    },
+    "Active Tutor Rate": { icon: Percent, bg: "#F5F3FF", color: "#7C3AED" },
+    "Avg Rating": { icon: Star, bg: "#FEFCE8", color: "#CA8A04" },
+    "Total Revenue": {
+        icon: CircleDollarSign,
+        bg: "#ECFDF5",
+        color: "#059669",
+    },
+    "Revenue / Tutor": { icon: TrendingUp, bg: "#ECFEFF", color: "#0891B2" },
+};
 
-const SectionCard = ({ title, children }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-    <h2 className="text-base font-bold text-gray-800 mb-5 flex items-center gap-2">
-      <span
-        style={{ background: BRAND_LIGHT, color: BRAND }}
-        className="inline-block w-1.5 h-5 rounded-full mr-1"
-      />
-      {title}
-    </h2>
-    {children}
-  </div>
-);
-
-const TutorsDashboard = () => {
-  const [activeTab, setActiveTab] = useState("JLT");
-  const [dashboard, setDashboard] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetchDashboard = async (branch) => {
-    setLoading(true);
-    try {
-      const url =
-        branch === "JLT"
-          ? "https://api.frwrdtutors.com/api/admin/dashboardTutorsBranch1017"
-          : "https://api.frwrdtutors.com/api/admin/dashboardTutorsBranch28866";
-      const { data } = await axios.get(url);
-      setDashboard(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboard("JLT");
-  }, []);
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    fetchDashboard(tab);
-  };
-
-  const statusData = dashboard
-    ? Object.entries(dashboard.statusDistribution).map(([name, value]) => ({
-        name,
-        value,
-      }))
-    : [];
-
-  const subjectData = dashboard
-    ? Object.entries(dashboard.subjectDistribution).map(([name, count]) => ({
-        name,
-        count,
-      }))
-    : [];
-
-  const qualificationData = dashboard
-    ? Object.entries(dashboard.qualificationDistribution).map(
-        ([name, count]) => ({ name, count })
-      )
-    : [];
-
-  const statusBadge = (status) => {
-    const map = {
-      approved: "bg-green-100 text-green-700",
-      pending: "bg-yellow-100 text-yellow-700",
-      rejected: "bg-red-100 text-red-700",
-      dormant: "bg-gray-100 text-gray-600",
-    };
-    return map[status?.toLowerCase()] || "bg-gray-100 text-gray-600";
-  };
-
-  return (
-    <div className="flex bg-[#F7F7FC] min-h-screen">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="p-6 max-w-screen-xl mx-auto w-full">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-7">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
-                Overview
-              </p>
-              <h1 className="text-2xl font-extrabold text-gray-900">
-                Tutors Dashboard
-              </h1>
+// ─── Reusable Components ─────────────────────────────────
+const SectionCard = ({ title, children, className = "" }) => (
+    <div
+        className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-5 ${className}`}
+    >
+        {title && (
+            <div className="flex items-center gap-2 mb-4">
+                <div
+                    style={{
+                        width: 4,
+                        height: 20,
+                        borderRadius: 2,
+                        background: BRAND,
+                    }}
+                />
+                <h3 className="font-semibold text-gray-800 text-base">
+                    {title}
+                </h3>
             </div>
-            <div
-              className="flex gap-1 p-1 rounded-xl"
-              style={{ background: BRAND_LIGHT }}
-            >
-              {["JLT", "MTC"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => handleTabChange(tab)}
-                  className="px-5 py-2 rounded-lg text-sm font-semibold transition-all"
-                  style={
-                    activeTab === tab
-                      ? {
-                          background: BRAND,
-                          color: "#fff",
-                          boxShadow: "0 2px 8px rgba(60,58,134,0.25)",
-                        }
-                      : { color: BRAND }
-                  }
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div
-                className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
-                style={{ borderColor: `${BRAND} transparent ${BRAND} ${BRAND}` }}
-              />
-            </div>
-          ) : dashboard ? (
-            <>
-              {/* KPI Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <StatCard
-                  accent
-                  title="Total Tutors"
-                  value={dashboard.overview.totalTutors}
-                />
-                <StatCard
-                  title="Approved"
-                  value={dashboard.overview.approvedTutors}
-                />
-                <StatCard
-                  title="Pending"
-                  value={dashboard.overview.pendingTutors}
-                />
-                <StatCard
-                  title="Dormant"
-                  value={dashboard.overview.dormantTutors}
-                />
-                <StatCard
-                  title="Rejected"
-                  value={dashboard.overview.rejectedTutors}
-                />
-                <StatCard
-                  title="Avg Rating"
-                  value={dashboard.overview.averageRating}
-                />
-                <StatCard
-                  title="Total Revenue"
-                  value={`AED ${dashboard.overview.totalRevenue?.toLocaleString()}`}
-                />
-                <StatCard
-                  title="Revenue / Tutor"
-                  value={`AED ${dashboard.overview.averageRevenuePerTutor?.toLocaleString()}`}
-                />
-              </div>
-
-              {/* Pie — Status */}
-              <SectionCard title="Tutor Status Distribution">
-                <ResponsiveContainer width="100%" height={320}>
-                  <PieChart>
-                    <Pie
-                      data={statusData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={110}
-                      innerRadius={55}
-                      paddingAngle={3}
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {statusData.map((_, index) => (
-                        <Cell
-                          key={index}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </SectionCard>
-
-              {/* Bar — Subjects */}
-              <SectionCard title="Subject Distribution">
-                <ResponsiveContainer width="100%" height={360}>
-                  <BarChart
-                    data={subjectData}
-                    margin={{ top: 4, right: 16, bottom: 40, left: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                    <XAxis
-                      dataKey="name"
-                      angle={-30}
-                      textAnchor="end"
-                      tick={{ fontSize: 11 }}
-                      interval={0}
-                    />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 10,
-                        border: "none",
-                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                    <Bar dataKey="count" fill={BRAND} radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </SectionCard>
-
-              {/* Bar — Qualifications */}
-              <SectionCard title="Qualification Distribution">
-                <ResponsiveContainer width="100%" height={360}>
-                  <BarChart
-                    data={qualificationData}
-                    margin={{ top: 4, right: 16, bottom: 40, left: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                    <XAxis
-                      dataKey="name"
-                      angle={-30}
-                      textAnchor="end"
-                      tick={{ fontSize: 11 }}
-                      interval={0}
-                    />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 10,
-                        border: "none",
-                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                    <Bar dataKey="count" fill="#10B981" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </SectionCard>
-
-              {/* Top Tutors Table */}
-              <SectionCard title="Top Tutors">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr
-                        style={{ background: BRAND_LIGHT }}
-                        className="text-left"
-                      >
-                        {["Name", "Email", "Rating", "Revenue", "Status"].map(
-                          (h) => (
-                            <th
-                              key={h}
-                              className="px-4 py-3 font-semibold text-xs uppercase tracking-wider"
-                              style={{ color: BRAND }}
-                            >
-                              {h}
-                            </th>
-                          )
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dashboard.topTutors.map((tutor, i) => (
-                        <tr
-                          key={tutor.id}
-                          className={`border-b transition-colors hover:bg-gray-50 ${
-                            i % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                          }`}
-                        >
-                          <td className="px-4 py-3 font-medium text-gray-900">
-                            {tutor.name}
-                          </td>
-                          <td className="px-4 py-3 text-gray-500">
-                            {tutor.email}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="flex items-center gap-1 font-semibold text-yellow-500">
-                              ★ {tutor.rating}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 font-semibold text-gray-800">
-                            AED {Number(tutor.revenue).toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadge(
-                                tutor.status
-                              )}`}
-                            >
-                              {tutor.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </SectionCard>
-            </>
-          ) : null}
-        </main>
-      </div>
+        )}
+        {children}
     </div>
-  );
+);
+
+const StatCard = ({ title, value }) => {
+    const meta = CARD_META[title] || {
+        icon: TrendingUp,
+        bg: "#F3F4F6",
+        color: GRAY,
+    };
+    const Icon = meta.icon;
+    return (
+        <div
+            className="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-3 hover:shadow-md transition-all"
+            style={{ boxShadow: "0 1px 6px rgba(60,58,134,0.07)" }}
+        >
+            <div className="flex items-center justify-between">
+                <span
+                    className="text-xs font-medium uppercase tracking-wider"
+                    style={{ color: GRAY }}
+                >
+                    {title}
+                </span>
+                <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: meta.bg }}
+                >
+                    <Icon size={20} strokeWidth={2.2} color={meta.color} />
+                </div>
+            </div>
+            <div className="text-xl font-bold" style={{ color: meta.color }}>
+                {value ?? "—"}
+            </div>
+        </div>
+    );
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div
+                style={{
+                    background: WHITE,
+                    border: "1px solid #E5E7EB",
+                    borderRadius: 10,
+                    padding: "8px 14px",
+                    fontSize: 13,
+                    color: "#1F2937",
+                    boxShadow: "0 4px 16px rgba(60,58,134,0.10)",
+                }}
+            >
+                <p className="text-xs text-gray-500 mb-1">{label}</p>
+                <p className="font-semibold" style={{ color: BRAND }}>
+                    {payload[0].value?.toLocaleString()}
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
+
+const EmptyState = ({ text = "No data available" }) => (
+    <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+        <svg
+            width="40"
+            height="40"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="mb-2 opacity-40"
+        >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 17v-2a4 4 0 014-4h0a4 4 0 014 4v2M9 17H7a2 2 0 01-2-2v-1a2 2 0 012-2h2m0 5h6m0 0h2a2 2 0 002-2v-1a2 2 0 00-2-2h-2"
+            />
+        </svg>
+        <span className="text-sm">{text}</span>
+    </div>
+);
+
+const StatusBadge = ({ status }) => {
+    const map = {
+        approved: { bg: "#ECFDF5", color: "#059669" },
+        pending: { bg: "#FFFBEB", color: "#D97706" },
+        rejected: { bg: "#FEF2F2", color: "#DC2626" },
+        dormant: { bg: "#F3F4F6", color: "#6B7280" },
+    };
+    const s = map[status?.toLowerCase()] || { bg: "#F3F4F6", color: "#6B7280" };
+    return (
+        <span
+            className="px-2.5 py-0.5 rounded-full text-xs font-medium"
+            style={{ background: s.bg, color: s.color }}
+        >
+            {status}
+        </span>
+    );
+};
+
+// ─── Main Component ──────────────────────────────────────
+const TutorsDashboard = () => {
+    const [activeTab, setActiveTab] = useState("JLT");
+    const [loading, setLoading] = useState(false);
+    const [dashboard, setDashboard] = useState(null);
+
+    const fetchDashboard = async (branch) => {
+        try {
+            setLoading(true);
+            const branchId = branch === "JLT" ? "1017" : "28866";
+            const { data } = await axios.get(
+                `https://api.frwrdtutors.com/api/admin/dashboardTutorsBranch${branchId}`,
+            );
+            setDashboard(data);
+            setActiveTab(branch);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDashboard("JLT");
+    }, []);
+
+    // ── Derived data ──
+    const statusData = dashboard
+        ? Object.entries(dashboard.statusDistribution || {}).map(
+              ([name, value]) => ({ name, value }),
+          )
+        : [];
+
+    const countryData = dashboard
+        ? Object.entries(dashboard.countryDistribution || {}).map(
+              ([name, value]) => ({ name, value }),
+          )
+        : [];
+
+   const subjectData = dashboard
+    ? Object.entries(dashboard.subjectDistribution || {})
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([name, count]) => ({
+              name,
+              count,
+          }))
+    : [];
+
+    const qualificationData = dashboard
+    ? Object.entries(dashboard.qualificationDistribution || {})
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([name, count]) => ({
+              name,
+              count,
+          }))
+    : [];
+
+   const monthlyTrendData = dashboard
+    ? Object.entries(dashboard.monthlyTutorTrend || {})
+          .sort(([a], [b]) => a.localeCompare(b))
+          .slice(-12)
+          .map(([month, count]) => ({
+              month,
+              count,
+          }))
+    : [];
+
+    const topTutors = dashboard?.topTutors || [];
+    const topRatedTutors = dashboard?.topRatedTutors || [];
+
+    const cards = dashboard
+        ? [
+              { title: "Total Tutors", value: dashboard.overview?.totalTutors },
+              { title: "Approved", value: dashboard.overview?.approvedTutors },
+              { title: "Pending", value: dashboard.overview?.pendingTutors },
+              { title: "Dormant", value: dashboard.overview?.dormantTutors },
+              { title: "Rejected", value: dashboard.overview?.rejectedTutors },
+              {
+                  title: "New Tutors This Month",
+                  value: dashboard.overview?.newTutorsThisMonth,
+              },
+              {
+                  title: "Active Tutor Rate",
+                  value: `${dashboard.overview?.activeTutorRate ?? 0}%`,
+              },
+              { title: "Avg Rating", value: dashboard.overview?.averageRating },
+              {
+                  title: "Total Revenue",
+                  value: `AED ${Number(dashboard.overview?.totalRevenue || 0).toLocaleString()}`,
+              },
+              {
+                  title: "Revenue / Tutor",
+                  value: `AED ${Number(dashboard.overview?.averageRevenuePerTutor || 0).toLocaleString()}`,
+              },
+          ]
+        : [];
+
+    return (
+        <div className="flex min-h-screen" style={{ background: "#F8F8FC" }}>
+            <Sidebar />
+            <div className="flex-1 min-w-0">
+                <Navbar />
+                <div className="px-6 py-5">
+                    {/* ── Header ── */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div>
+                            <p
+                                className="text-xs font-medium uppercase tracking-widest mb-1"
+                                style={{ color: GRAY }}
+                            >
+                                Tutors Overview
+                            </p>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                {activeTab} — Tutors Dashboard
+                            </h1>
+                        </div>
+                        <div
+                            className="flex p-1 rounded-xl"
+                            style={{
+                                background: BRAND_LIGHT,
+                                border: "1px solid #CECBF6",
+                            }}
+                        >
+                            {["JLT", "MTC"].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => fetchDashboard(tab)}
+                                    className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+                                    style={
+                                        activeTab === tab
+                                            ? {
+                                                  background: BRAND,
+                                                  color: WHITE,
+                                                  boxShadow:
+                                                      "0 2px 8px rgba(60,58,134,0.25)",
+                                              }
+                                            : {
+                                                  background: "transparent",
+                                                  color: BRAND,
+                                              }
+                                    }
+                                >
+                                    {tab} Branch
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-32 gap-4">
+                            <div
+                                className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
+                                style={{
+                                    borderColor: BRAND_LIGHT,
+                                    borderTopColor: BRAND,
+                                }}
+                            />
+                            <p className="text-sm" style={{ color: GRAY }}>
+                                Loading tutors data…
+                            </p>
+                        </div>
+                    ) : dashboard ? (
+                        <>
+                            {/* ── Stat Cards ── */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                                {cards.map((c, i) => (
+                                    <StatCard
+                                        key={i}
+                                        title={c.title}
+                                        value={c.value}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* ── Row 1: Status + Country Pie ── */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+                                <SectionCard title="Tutor Status Distribution">
+                                    {statusData.every((d) => d.value === 0) ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <PieChart>
+                                                <Pie
+                                                    data={statusData}
+                                                    dataKey="value"
+                                                    nameKey="name"
+                                                    outerRadius={100}
+                                                    innerRadius={50}
+                                                    paddingAngle={3}
+                                                    label={({
+                                                        name,
+                                                        percent,
+                                                    }) =>
+                                                        `${name} ${(percent * 100).toFixed(0)}%`
+                                                    }
+                                                    labelLine={false}
+                                                >
+                                                    {statusData.map((_, i) => (
+                                                        <Cell
+                                                            key={i}
+                                                            fill={
+                                                                COLORS[
+                                                                    i %
+                                                                        COLORS.length
+                                                                ]
+                                                            }
+                                                        />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                />
+                                                <Legend
+                                                    iconType="circle"
+                                                    iconSize={8}
+                                                    wrapperStyle={{
+                                                        fontSize: 12,
+                                                        color: GRAY,
+                                                    }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+
+                                <SectionCard title="Country Distribution">
+                                    {countryData.every((d) => d.value === 0) ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <PieChart>
+                                                <Pie
+                                                    data={countryData}
+                                                    dataKey="value"
+                                                    nameKey="name"
+                                                    outerRadius={100}
+                                                    innerRadius={50}
+                                                    paddingAngle={3}
+                                                    label={({
+                                                        name,
+                                                        percent,
+                                                    }) =>
+                                                        `${name} ${(percent * 100).toFixed(0)}%`
+                                                    }
+                                                    labelLine={false}
+                                                >
+                                                    {countryData.map((_, i) => (
+                                                        <Cell
+                                                            key={i}
+                                                            fill={
+                                                                COLORS[
+                                                                    i %
+                                                                        COLORS.length
+                                                                ]
+                                                            }
+                                                        />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                />
+                                                <Legend
+                                                    iconType="circle"
+                                                    iconSize={8}
+                                                    wrapperStyle={{
+                                                        fontSize: 12,
+                                                        color: GRAY,
+                                                    }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+                            </div>
+
+                            {/* ── Row 2: Subject + Qualification Bar ── */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+                                <SectionCard title="Subject Distribution Top 10">
+                                    {subjectData.length === 0 ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <BarChart
+                                                data={subjectData}
+                                                barSize={16}
+                                                margin={{
+                                                    top: 4,
+                                                    right: 8,
+                                                    bottom: 40,
+                                                    left: 0,
+                                                }}
+                                            >
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    stroke="#F3F4F6"
+                                                    vertical={false}
+                                                />
+                                                <XAxis
+                                                    dataKey="name"
+                                                    tick={{
+                                                        fontSize: 10,
+                                                        fill: GRAY,
+                                                    }}
+                                                    angle={-30}
+                                                    textAnchor="end"
+                                                    interval={0}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                    cursor={{ fill: "#F3F4F6" }}
+                                                />
+                                                <Bar
+                                                    dataKey="count"
+                                                    fill={BRAND}
+                                                    radius={[5, 5, 0, 0]}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+
+                                <SectionCard title="Qualification Distribution Top 10">
+                                    {qualificationData.length === 0 ? (
+                                        <EmptyState />
+                                    ) : (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height={280}
+                                        >
+                                            <BarChart
+                                                data={qualificationData}
+                                                barSize={16}
+                                                margin={{
+                                                    top: 4,
+                                                    right: 8,
+                                                    bottom: 40,
+                                                    left: 0,
+                                                }}
+                                            >
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    stroke="#F3F4F6"
+                                                    vertical={false}
+                                                />
+                                                <XAxis
+                                                    dataKey="name"
+                                                    tick={{
+                                                        fontSize: 10,
+                                                        fill: GRAY,
+                                                    }}
+                                                    angle={-30}
+                                                    textAnchor="end"
+                                                    interval={0}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis
+                                                    tick={{
+                                                        fontSize: 11,
+                                                        fill: GRAY,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <Tooltip
+                                                    content={<CustomTooltip />}
+                                                    cursor={{ fill: "#F3F4F6" }}
+                                                />
+                                                <Bar
+                                                    dataKey="count"
+                                                    fill="#10B981"
+                                                    radius={[5, 5, 0, 0]}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
+                                </SectionCard>
+                            </div>
+
+                            {/* ── Row 3: Monthly Trend ── */}
+                            <SectionCard
+                                title="Monthly Tutor Trend"
+                                className="mb-5"
+                            >
+                                {monthlyTrendData.length === 0 ? (
+                                    <EmptyState />
+                                ) : (
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height={280}
+                                    >
+                                        <LineChart data={monthlyTrendData}>
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                stroke="#F3F4F6"
+                                            />
+                                            <XAxis
+                                                dataKey="month"
+                                                tick={{
+                                                    fontSize: 11,
+                                                    fill: GRAY,
+                                                }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                            />
+                                            <YAxis
+                                                tick={{
+                                                    fontSize: 11,
+                                                    fill: GRAY,
+                                                }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                            />
+                                            <Tooltip
+                                                content={<CustomTooltip />}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="count"
+                                                stroke={BRAND}
+                                                strokeWidth={2.5}
+                                                dot={{ r: 3, fill: BRAND }}
+                                                activeDot={{ r: 5 }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                )}
+                            </SectionCard>
+
+                            {/* ── Row 4: Top Rated Tutors Table ── */}
+                            <SectionCard
+                                title="Top Rated Tutors"
+                                className="mb-5"
+                            >
+                                {topRatedTutors.length === 0 ? (
+                                    <EmptyState />
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr
+                                                    style={{
+                                                        borderBottom:
+                                                            "1px solid #F3F4F6",
+                                                    }}
+                                                >
+                                                    {[
+                                                        "Name",
+                                                        "Email",
+                                                        "Rating",
+                                                        "Status",
+                                                    ].map((h) => (
+                                                        <th
+                                                            key={h}
+                                                            className="pb-3 text-left font-medium"
+                                                            style={{
+                                                                color: GRAY,
+                                                                fontSize: 11,
+                                                                textTransform:
+                                                                    "uppercase",
+                                                                letterSpacing:
+                                                                    "0.05em",
+                                                            }}
+                                                        >
+                                                            {h}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {topRatedTutors.map((tutor) => (
+                                                    <tr
+                                                        key={tutor.id}
+                                                        style={{
+                                                            borderBottom:
+                                                                "1px solid #F9FAFB",
+                                                        }}
+                                                        className="hover:bg-gray-50 transition-colors"
+                                                    >
+                                                        <td className="py-2.5">
+                                                            <div className="flex items-center gap-2.5">
+                                                                <div
+                                                                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                                                                    style={{
+                                                                        background:
+                                                                            BRAND,
+                                                                    }}
+                                                                >
+                                                                    {tutor.name
+                                                                        ?.charAt(
+                                                                            0,
+                                                                        )
+                                                                        ?.toUpperCase() ||
+                                                                        "T"}
+                                                                </div>
+                                                                <span className="font-medium text-gray-800">
+                                                                    {tutor.name}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-2.5 text-gray-500">
+                                                            {tutor.email || "—"}
+                                                        </td>
+                                                        <td className="py-2.5">
+                                                            <span className="flex items-center gap-1 font-semibold text-amber-500">
+                                                                <Star size={16} />{" "}
+                                                                {tutor.rating}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-2.5">
+                                                            <StatusBadge
+                                                                status={
+                                                                    tutor.status
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </SectionCard>
+
+                            {/* ── Row 5: Top Tutors by Revenue ── */}
+                            <SectionCard title="Top Tutors by Revenue">
+                                {topTutors.length === 0 ? (
+                                    <EmptyState />
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr
+                                                    style={{
+                                                        borderBottom:
+                                                            "1px solid #F3F4F6",
+                                                    }}
+                                                >
+                                                    {[
+                                                        "Name",
+                                                        "Email",
+                                                        "Rating",
+                                                        "Revenue",
+                                                        "Status",
+                                                    ].map((h) => (
+                                                        <th
+                                                            key={h}
+                                                            className="pb-3 text-left font-medium"
+                                                            style={{
+                                                                color: GRAY,
+                                                                fontSize: 11,
+                                                                textTransform:
+                                                                    "uppercase",
+                                                                letterSpacing:
+                                                                    "0.05em",
+                                                            }}
+                                                        >
+                                                            {h}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {topTutors.map((tutor) => (
+                                                    <tr
+                                                        key={tutor.id}
+                                                        style={{
+                                                            borderBottom:
+                                                                "1px solid #F9FAFB",
+                                                        }}
+                                                        className="hover:bg-gray-50 transition-colors"
+                                                    >
+                                                        <td className="py-2.5">
+                                                            <div className="flex items-center gap-2.5">
+                                                                <div
+                                                                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                                                                    style={{
+                                                                        background:
+                                                                            "#10B981",
+                                                                    }}
+                                                                >
+                                                                    {tutor.name
+                                                                        ?.charAt(
+                                                                            0,
+                                                                        )
+                                                                        ?.toUpperCase() ||
+                                                                        "T"}
+                                                                </div>
+                                                                <span className="font-medium text-gray-800">
+                                                                    {tutor.name}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-2.5 text-gray-500">
+                                                            {tutor.email || "—"}
+                                                        </td>
+                                                        <td className="py-2.5">
+                                                            <span className="flex items-center gap-1 font-semibold text-amber-500">
+                                                                <Star size={16} />{" "}
+                                                                {tutor.rating}
+                                                            </span>
+                                                        </td>
+                                                        <td
+                                                            className="py-2.5 font-semibold"
+                                                            style={{
+                                                                color: BRAND,
+                                                            }}
+                                                        >
+                                                            AED{" "}
+                                                            {Number(
+                                                                tutor.revenue,
+                                                            ).toLocaleString()}
+                                                        </td>
+                                                        <td className="py-2.5">
+                                                            <StatusBadge
+                                                                status={
+                                                                    tutor.status
+                                                                }
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </SectionCard>
+                        </>
+                    ) : (
+                        <EmptyState text="Failed to load data. Please try again." />
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default TutorsDashboard;

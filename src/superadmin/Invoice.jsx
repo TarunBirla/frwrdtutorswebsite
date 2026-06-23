@@ -145,12 +145,11 @@ const Invoice = () => {
                           </td>
 
                           <td className="px-4 py-3 text-gray-700">
-                            {invoice.client?.first_name}{" "}
-                            {invoice.client?.last_name}
+                            {invoice.client_name}{" "}
                           </td>
 
                           <td className="px-4 py-3 text-gray-500">
-                            {invoice.client?.email ?? "—"}
+                            {invoice.client_email ?? "—"}
                           </td>
 
                           <td className="px-4 py-3 font-semibold text-gray-800">

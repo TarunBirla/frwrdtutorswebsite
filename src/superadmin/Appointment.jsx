@@ -30,16 +30,32 @@ const Appointment = () => {
             key: "topic",
             label: "Topic",
         },
-        {
-            key: "start",
-            label: "Start Time",
-            render: (row) => new Date(row.start).toLocaleString(),
-        },
-        {
-            key: "finish",
-            label: "Finish Time",
-            render: (row) => new Date(row.finish).toLocaleString(),
-        },
+       {
+    key: "start",
+    label: "Start Time",
+    render: (row) =>
+        new Date(row.start_time).toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        }),
+},
+{
+    key: "finish",
+    label: "Finish Time",
+    render: (row) =>
+        new Date(row.finish_time).toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        }),
+},
         {
             key: "status",
             label: "Status",
@@ -52,12 +68,23 @@ const Appointment = () => {
         {
             key: "service",
             label: "Service",
-            render: (row) => row.service?.name || "-",
+            render: (row) => row.service_name || "-",
         },
         {
             key: "rate",
             label: "Rate",
-            render: (row) => `AED ${row.service?.dft_charge_rate || 0}`,
+            render: (row) => {
+                try {
+                    const service =
+                        typeof row.service === "string"
+                            ? JSON.parse(row.service)
+                            : row.service;
+
+                    return `AED ${service?.dft_charge_rate || 0}`;
+                } catch {
+                    return "AED 0";
+                }
+            },
         },
     ];
 
@@ -238,7 +265,10 @@ const Appointment = () => {
                                 }
                                 options={clients.map((c) => ({
                                     value: c.id,
-                                    label: `${c.first_name} ${c.last_name}`,
+                                    label:
+                                        `${c.first_name || ""} ${c.last_name || ""}`.trim() ||
+                                        c.email ||
+                                        `Client #${c.id}`,
                                 }))}
                                 onChange={(selected) => {
                                     setClientId(selected?.value || "");
@@ -254,7 +284,10 @@ const Appointment = () => {
                                 isClearable
                                 options={students.map((s) => ({
                                     value: s.id,
-                                    label: `${s.first_name} ${s.last_name}`,
+                                    label:
+                                        `${s.first_name || ""} ${s.last_name || ""}`.trim() ||
+                                        s.email ||
+                                        `Student #${s.id}`,
                                 }))}
                                 value={
                                     students.find((s) => s.id == studentId)
@@ -283,7 +316,10 @@ const Appointment = () => {
                                 isClearable
                                 options={tutors.map((t) => ({
                                     value: t.id,
-                                    label: `${t.first_name} ${t.last_name}`,
+                                    label:
+                                        `${t.first_name || ""} ${t.last_name || ""}`.trim() ||
+                                        t.email ||
+                                        `Tutor #${t.id}`,
                                 }))}
                                 value={
                                     tutors.find((t) => t.id == tutorId)
@@ -308,22 +344,22 @@ const Appointment = () => {
                             />
 
                             <div className="flex gap-3 mb-6">
-                            <button
-                                onClick={handleSearch}
-                                className="bg-[#3C3A86] text-white px-4 py-2 rounded-xl flex items-center gap-2"
-                            >
-                                <Search size={16} />
-                                Search
-                            </button>
+                                <button
+                                    onClick={handleSearch}
+                                    className="bg-[#3C3A86] text-white px-4 py-2 rounded-xl flex items-center gap-2"
+                                >
+                                    <Search size={16} />
+                                    Search
+                                </button>
 
-                            <button
-                                onClick={handleReset}
-                                className="bg-gray-200 px-4 py-2 rounded-xl flex items-center gap-2"
-                            >
-                                <RotateCcw size={16} />
-                                Reset
-                            </button>
-                        </div>
+                                <button
+                                    onClick={handleReset}
+                                    className="bg-gray-200 px-4 py-2 rounded-xl flex items-center gap-2"
+                                >
+                                    <RotateCcw size={16} />
+                                    Reset
+                                </button>
+                            </div>
                         </div>
 
                         {/* <div className="flex gap-3 mb-6">

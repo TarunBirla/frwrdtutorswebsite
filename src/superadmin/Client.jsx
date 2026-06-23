@@ -16,30 +16,7 @@ const Clients = () => {
         { key: "first_name", label: "First Name" },
         { key: "last_name", label: "Last Name" },
         { key: "email", label: "Email" },
-        {
-            key: "role_type",
-            label: "Role",
-            render: (row) => (
-                <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#3C3A86]/10 text-[#3C3A86]">
-                    {row.role_type}
-                </span>
-            ),
-        },
-        // {
-        //     key: "status",
-        //     label: "Status",
-        //     render: (row) => (
-        //         <span
-        //             className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-        //                 row.status === "live"
-        //                     ? "bg-green-100 text-green-700"
-        //                     : "bg-red-100 text-red-700"
-        //             }`}
-        //         >
-        //             {row.status === "live" ? "Active" : "Inactive"}
-        //         </span>
-        //     ),
-        // },
+
         {
             key: "students",
             label: "Students",
@@ -69,7 +46,7 @@ const Clients = () => {
     const [activeCount, setActiveCount] = useState(0);
     const [inactiveCount, setInactiveCount] = useState(0);
 
-    const fetchClients = async (brand, page = 1) => {
+    const fetchClients = async (brand, page = 1, status = "all") => {
         setLoading(true);
 
         try {
@@ -78,7 +55,9 @@ const Clients = () => {
                     ? "https://api.frwrdtutors.com/api/admin/all-clientsBranch1017"
                     : "https://api.frwrdtutors.com/api/admin/all-clientsBranch28866";
 
-            const { data } = await axios.get(`${base}?page=${page}`);
+            const { data } = await axios.get(
+                `${base}?page=${page}&status=${status}`,
+            );
 
             setClients(data.clients || []);
             setTotalRecords(data.count || 0);
@@ -87,8 +66,7 @@ const Clients = () => {
             setActiveCount(data.activeCount || 0);
             setInactiveCount(data.inactiveCount || 0);
         } catch (err) {
-            console.error(err);
-            setClients([]);
+            console.log(err);
         } finally {
             setLoading(false);
         }
@@ -131,21 +109,11 @@ const Clients = () => {
         fetchClients(tab, 1);
     };
 
-    const filteredClients = clients.filter((client) => {
-        const searchMatch =
-            `${client.first_name} ${client.last_name} ${client.email}`
-                .toLowerCase()
-                .includes(search.toLowerCase());
-
-        const statusMatch =
-            statusFilter === "all"
-                ? true
-                : statusFilter === "active"
-                  ? client.status === "live"
-                  : client.status === "dormant";
-
-        return searchMatch && statusMatch;
-    });
+    const filteredClients = clients.filter((client) =>
+    `${client.first_name} ${client.last_name} ${client.email}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+);
 
     const filteredStudents = students.filter((student) =>
         `${student.first_name} ${student.last_name} ${student.email}`
@@ -219,18 +187,25 @@ const Clients = () => {
 
                         <div className="flex gap-2 mb-4">
                             <button
-                                onClick={() => setStatusFilter("all")}
+                                // onClick={() => setStatusFilter("all")}
+                                onClick={() => {
+                                    setStatusFilter("all");
+                                    fetchClients(activeTab, 1, "all");
+                                }}
                                 className={`px-4 py-2 rounded-lg text-sm ${
                                     statusFilter === "all"
                                         ? "bg-[#3C3A86] text-white"
                                         : "bg-gray-100"
                                 }`}
                             >
-                                All ({clients.length})
+                                All ({totalRecords})
                             </button>
 
                             <button
-                                onClick={() => setStatusFilter("active")}
+                                onClick={() => {
+                                    setStatusFilter("active");
+                                    fetchClients(activeTab, 1, "live");
+                                }}
                                 className={`px-4 py-2 rounded-lg text-sm ${
                                     statusFilter === "active"
                                         ? "bg-green-600 text-white"
@@ -241,7 +216,10 @@ const Clients = () => {
                             </button>
 
                             <button
-                                onClick={() => setStatusFilter("inactive")}
+                                onClick={() => {
+                                    setStatusFilter("inactive");
+                                    fetchClients(activeTab, 1, "dormant");
+                                }}
                                 className={`px-4 py-2 rounded-lg text-sm ${
                                     statusFilter === "inactive"
                                         ? "bg-red-600 text-white"
@@ -274,7 +252,17 @@ const Clients = () => {
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
-                            onPageChange={(p) => fetchClients(activeTab, p)}
+                            onPageChange={(p) =>
+                                fetchClients(
+                                    activeTab,
+                                    p,
+                                    statusFilter === "active"
+                                        ? "live"
+                                        : statusFilter === "inactive"
+                                          ? "dormant"
+                                          : "all",
+                                )
+                            }
                         />
                     </div>
                 </main>
