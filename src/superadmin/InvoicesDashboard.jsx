@@ -28,12 +28,12 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#3C3A86";
+const BRAND = "#5D4C29";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 const COLORS = [
-    "#3C3A86",
+    "#5D4C29",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -43,7 +43,7 @@ const COLORS = [
 
 // ─── Card meta ───────────────────────────────────────────
 const CARD_META = {
-    "Total Invoices": { icon: FileText, bg: "#EEF2FF", color: "#4338CA" },
+    "Total Invoices": { icon: FileText, bg: "#EEF2FF", color: "#5D4C29" },
     "Total Revenue": {
         icon: CircleDollarSign,
         bg: "#ECFDF5",
@@ -55,7 +55,7 @@ const CARD_META = {
     Outstanding: { icon: Wallet, bg: "#FEF2F2", color: "#DC2626" },
     "Avg Invoice": { icon: TrendingUp, bg: "#ECFEFF", color: "#0891B2" },
     "Collection Rate": { icon: Percent, bg: "#F5F3FF", color: "#7C3AED" },
-    Branch: { icon: FileText, bg: "#EEF2FF", color: "#4338CA" },
+    Branch: { icon: FileText, bg: "#EEF2FF", color: "#5D4C29" },
 };
 
 // ─── Reusable Components ─────────────────────────────────

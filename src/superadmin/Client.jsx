@@ -23,7 +23,7 @@ const Clients = () => {
             render: (row) => (
                 <button
                     onClick={() => handleViewStudents(row)}
-                    className="px-3 py-1 bg-[#3C3A86] text-white rounded-lg text-xs hover:bg-[#3d3b85] transition-colors"
+                    className="px-3 py-1 bg-[#5D4C29] text-white rounded-lg text-xs hover:bg-[#3d3b85] transition-colors"
                 >
                     View Students
                 </button>
@@ -135,7 +135,7 @@ const Clients = () => {
                     <div className="flex items-center gap-3 mb-6">
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
-                            style={{ backgroundColor: "#3C3A86" }}
+                            style={{ backgroundColor: "#5D4C29" }}
                         >
                             <Users size={20} className="text-white" />
                         </div>
@@ -165,12 +165,12 @@ const Clients = () => {
                             <div
                                 className="text-sm font-medium px-4 py-2 rounded-xl"
                                 style={{
-                                    backgroundColor: "#3C3A8618",
-                                    color: "#3C3A86",
+                                    backgroundColor: "#5D4C2918",
+                                    color: "#5D4C29",
                                 }}
                             >
                                 <div className="flex gap-3 flex-wrap">
-                                    <div className="px-4 py-2 rounded-xl bg-[#3C3A8618] text-[#3C3A86] text-sm font-medium">
+                                    <div className="px-4 py-2 rounded-xl bg-[#5D4C2918] text-[#5D4C29] text-sm font-medium">
                                         Total: {totalRecords}
                                     </div>
 
@@ -194,7 +194,7 @@ const Clients = () => {
                                 }}
                                 className={`px-4 py-2 rounded-lg text-sm ${
                                     statusFilter === "all"
-                                        ? "bg-[#3C3A86] text-white"
+                                        ? "bg-[#5D4C29] text-white"
                                         : "bg-gray-100"
                                 }`}
                             >
@@ -236,7 +236,7 @@ const Clients = () => {
                                 placeholder="Search by Name or Email..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3C3A86]"
+                                className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5D4C29]"
                             />
                         </div>
 
@@ -276,7 +276,7 @@ const Clients = () => {
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-9 h-9 rounded-xl flex items-center justify-center"
-                                        style={{ backgroundColor: "#3C3A86" }}
+                                        style={{ backgroundColor: "#5D4C29" }}
                                     >
                                         <GraduationCap
                                             size={18}
@@ -311,7 +311,7 @@ const Clients = () => {
                                     placeholder="Search students by name or email..."
                                     value={studentSearch}
                                     onChange={(e) => setStudentSearch(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3C3A86]"
+                                    className="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#5D4C29]"
                                 />
                             </div> */}
 
@@ -319,7 +319,7 @@ const Clients = () => {
                             <div className="overflow-auto flex-1 px-6 pb-6 pt-2">
                                 {studentsLoading ? (
                                     <div className="flex items-center justify-center py-16">
-                                        <div className="w-8 h-8 border-4 border-[#3C3A86]/20 border-t-[#3C3A86] rounded-full animate-spin" />
+                                        <div className="w-8 h-8 border-4 border-[#5D4C29]/20 border-t-[#5D4C29] rounded-full animate-spin" />
                                     </div>
                                 ) : filteredStudents.length > 0 ? (
                                     <table className="w-full text-sm">
@@ -344,7 +344,7 @@ const Clients = () => {
                                                 (student, index) => (
                                                     <tr
                                                         key={student.id}
-                                                        className={`border-b border-gray-50 hover:bg-[#3C3A86]/5 transition-colors ${
+                                                        className={`border-b border-gray-50 hover:bg-[#5D4C29]/5 transition-colors ${
                                                             index % 2 === 0
                                                                 ? "bg-white"
                                                                 : "bg-gray-50/50"

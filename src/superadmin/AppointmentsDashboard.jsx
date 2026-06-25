@@ -29,13 +29,13 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#3C3A86";
+const BRAND = "#5D4C29";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 
 const COLORS = [
-    "#3C3A86",
+    "#5D4C29",
     "#10B981",
     "#EF4444",
     "#F59E0B",
@@ -45,7 +45,7 @@ const COLORS = [
 
 const STATUS_COLORS = {
     completed: "#10B981",
-    planned: "#3C3A86",
+    planned: "#5D4C29",
     cancelled: "#EF4444",
     pending: "#F59E0B",
     rescheduled: "#8B5CF6",
@@ -61,10 +61,10 @@ const CARD_META = {
     "Total Appointments": {
         icon: CalendarDays,
         bg: "#EEF2FF",
-        color: "#4338CA",
+        color: "#5D4C29",
     },
     Completed: { icon: CheckCircle, bg: "#ECFDF5", color: "#059669" },
-    Planned: { icon: Clock3, bg: "#EEF2FF", color: "#4338CA" },
+    Planned: { icon: Clock3, bg: "#EEF2FF", color: "#5D4C29" },
     Cancelled: { icon: XCircle, bg: "#FEF2F2", color: "#DC2626" },
     "Completion Rate": { icon: TrendingUp, bg: "#F5F3FF", color: "#7C3AED" },
     "Online Lessons": { icon: Monitor, bg: "#ECFEFF", color: "#0891B2" },
@@ -256,11 +256,15 @@ const AppointmentsDashboard = () => {
           )
         : [];
 
-    const monthlyTrendData = dashboard
-        ? Object.entries(dashboard.monthlyLessonsTrend || {}).map(
-              ([month, value]) => ({ month, value }),
-          )
-        : [];
+   const monthlyTrendData = dashboard
+  ? Object.entries(dashboard.monthlyLessonsTrend || {})
+      .map(([month, value]) => ({
+        month,
+        value: Number(value),
+      }))
+      .sort((a, b) => new Date(a.month) - new Date(b.month)) // Ascending
+      .slice(-10) // Latest 10 months
+  : [];
 
     const cards = dashboard
         ? [
@@ -535,12 +539,13 @@ const AppointmentsDashboard = () => {
                                                     stroke="#F3F4F6"
                                                     vertical={false}
                                                 />
-                                                <XAxis
+                                                                                          <XAxis
                                                     dataKey="month"
-                                                    tick={{
-                                                        fontSize: 11,
-                                                        fill: GRAY,
-                                                    }}
+                                                    interval={0}
+                                                    angle={-45}
+                                                    textAnchor="end"
+                                                    height={60}
+                                                    tick={{ fontSize: 10, fill: GRAY }}
                                                     axisLine={false}
                                                     tickLine={false}
                                                 />

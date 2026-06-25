@@ -19,7 +19,7 @@ const COLUMNS = [
   //   key: "role_type",
   //   label: "Role",
   //   render: (row) => (
-  //     <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#3C3A86]/10 text-[#3C3A86]">
+  //     <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#5D4C29]/10 text-[#5D4C29]">
   //       {row.role_type}
   //     </span>
   //   ),
@@ -83,7 +83,7 @@ const Students = () => {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: "#3C3A86" }}
+              style={{ backgroundColor: "#5D4C29" }}
             >
               <GraduationCap size={20} className="text-white" />
             </div>
@@ -111,7 +111,7 @@ const Students = () => {
 
               <div
                 className="text-sm font-medium px-4 py-2 rounded-xl"
-                style={{ backgroundColor: "#3C3A8618", color: "#3C3A86" }}
+                style={{ backgroundColor: "#5D4C2918", color: "#5D4C29" }}
               >
                 Total: {totalRecords.toLocaleString()} students
               </div>
@@ -124,7 +124,7 @@ const Students = () => {
                 placeholder="Search by Name or Email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3C3A86]"
+                className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5D4C29]"
               />
             </div>
 

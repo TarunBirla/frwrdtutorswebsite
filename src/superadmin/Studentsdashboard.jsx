@@ -28,12 +28,12 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#3C3A86";
+const BRAND = "#5D4C29";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 const COLORS = [
-    "#3C3A86",
+    "#5D4C29",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -43,7 +43,7 @@ const COLORS = [
 
 // ─── Card meta ───────────────────────────────────────────
 const CARD_META = {
-    "Total Students": { icon: GraduationCap, bg: "#EEF2FF", color: "#4338CA" },
+    "Total Students": { icon: GraduationCap, bg: "#EEF2FF", color: "#5D4C29" },
     "New This Month": { icon: UserPlus, bg: "#FFF7ED", color: "#EA580C" },
     "Photo Coverage": { icon: Camera, bg: "#F5F3FF", color: "#7C3AED" },
     "Paying Clients": { icon: CreditCard, bg: "#ECFDF5", color: "#059669" },

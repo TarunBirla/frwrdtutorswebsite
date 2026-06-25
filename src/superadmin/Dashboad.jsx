@@ -35,13 +35,13 @@ import {
     Star,
 } from "lucide-react";
 
-const BRAND = "#3C3A86";
+const BRAND = "#5D4C29";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 
 const COLORS = [
-    "#3C3A86",
+    "#5D4C29",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -53,7 +53,7 @@ const cardIcons = {
     "Total Clients": {
         icon: Users,
         bg: "#EEF2FF",
-        color: "#4338CA",
+        color: "#5D4C29",
     },
 
     "Total Students": {
@@ -77,7 +77,7 @@ const cardIcons = {
     "Approved Tutors": {
         icon: CheckCircle,
         bg: "#EEF2FF",
-        color: "#4338CA",
+        color: "#5D4C29",
     },
 
     "Pending Tutors": {
@@ -89,7 +89,7 @@ const cardIcons = {
     Appointments: {
         icon: CalendarDays,
         bg: "#EEF2FF",
-        color: "#4338CA",
+        color: "#5D4C29",
     },
 
     "Completed Lessons": {

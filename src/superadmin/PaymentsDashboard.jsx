@@ -29,12 +29,12 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#3C3A86";
+const BRAND = "#5D4C29";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 const COLORS = [
-    "#3C3A86",
+    "#5D4C29",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -330,7 +330,7 @@ const PaymentsDashboard = () => {
                                                 width: 4,
                                                 height: 20,
                                                 borderRadius: 2,
-                                                background: "#F59E0B",
+                                                background: "#5D4C29",
                                             }}
                                         />
                                         <span className="text-sm font-semibold text-gray-700">
@@ -341,7 +341,7 @@ const PaymentsDashboard = () => {
                                         className="text-sm font-bold px-3 py-1 rounded-full"
                                         style={{
                                             background: "#FFF7ED",
-                                            color: "#EA580C",
+                                            color: "#5D4C29",
                                         }}
                                     >
                                         {avgPaymentTime} Days
@@ -355,7 +355,7 @@ const PaymentsDashboard = () => {
                                         className="h-3 rounded-full transition-all duration-700"
                                         style={{
                                             width: `${Math.min(avgPaymentTime, 100)}%`,
-                                            background: "#F59E0B",
+                                            background: "#5D4C29",
                                         }}
                                     />
                                 </div>

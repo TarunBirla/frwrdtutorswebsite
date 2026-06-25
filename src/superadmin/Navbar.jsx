@@ -25,7 +25,7 @@ const Navbar = () => {
       
       <div>
         
-        <h1 className="text-xl font-bold" style={{ color: "#3C3A86" }}>
+        <h1 className="text-xl font-bold" style={{ color: "#5D4C29" }}>
           {title}
         </h1>
         <p className="text-xs text-gray-400">Welcome back, Admin</p>
@@ -40,7 +40,7 @@ const Navbar = () => {
           <input
             type="text"
             placeholder="Search..."
-            className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3C3A86]/30 w-52"
+            className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5D4C29]/30 w-52"
           />
         </div> */}
 
@@ -50,7 +50,7 @@ const Navbar = () => {
           <img
             src="https://i.pravatar.cc/40"
             alt="admin"
-            className="w-8 h-8 rounded-full object-cover ring-2 ring-[#3C3A86]/30"
+            className="w-8 h-8 rounded-full object-cover ring-2 ring-[#5D4C29]/30"
           />
           <div className="hidden md:block">
             <p className="text-xs font-semibold text-gray-800">Admin</p>

@@ -96,7 +96,7 @@ const Tutors = () => {
                     <div className="flex items-center gap-3 mb-6">
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center"
-                            style={{ backgroundColor: "#3C3A86" }}
+                            style={{ backgroundColor: "#5D4C29" }}
                         >
                             <UserCog size={20} className="text-white" />
                         </div>
@@ -127,12 +127,12 @@ const Tutors = () => {
                             <div
                                 className="text-sm font-medium px-4 py-2 rounded-xl"
                                 style={{
-                                    backgroundColor: "#3C3A8618",
-                                    color: "#3C3A86",
+                                    backgroundColor: "#5D4C2918",
+                                    color: "#5D4C29",
                                 }}
                             >
                                 <div className="flex flex-wrap gap-2">
-                                    <div className="px-4 py-2 rounded-xl bg-[#3C3A8618] text-[#3C3A86] text-sm font-medium">
+                                    <div className="px-4 py-2 rounded-xl bg-[#5D4C2918] text-[#5D4C29] text-sm font-medium">
                                         Total: {totalRecords}
                                     </div>
 
@@ -160,7 +160,7 @@ const Tutors = () => {
                                 onClick={() => setStatusFilter("all")}
                                 className={`px-4 py-2 rounded-lg text-sm ${
                                     statusFilter === "all"
-                                        ? "bg-[#3C3A86] text-white"
+                                        ? "bg-[#5D4C29] text-white"
                                         : "bg-gray-100"
                                 }`}
                             >
@@ -219,7 +219,7 @@ const Tutors = () => {
                                 placeholder="Search by Name or Email..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3C3A86]"
+                                className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5D4C29]"
                             />
                         </div>
 

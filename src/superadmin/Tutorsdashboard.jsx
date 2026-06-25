@@ -31,12 +31,12 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#3C3A86";
+const BRAND = "#5D4C29";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 const COLORS = [
-    "#3C3A86",
+    "#5D4C29",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -46,7 +46,7 @@ const COLORS = [
 
 // ─── Card meta ───────────────────────────────────────────
 const CARD_META = {
-    "Total Tutors": { icon: Users, bg: "#EEF2FF", color: "#4338CA" },
+    "Total Tutors": { icon: Users, bg: "#EEF2FF", color: "#5D4C29" },
     Approved: { icon: BadgeCheck, bg: "#ECFDF5", color: "#059669" },
     Pending: { icon: Clock3, bg: "#FFF7ED", color: "#EA580C" },
     Dormant: { icon: UserX, bg: "#F3F4F6", color: "#6B7280" },

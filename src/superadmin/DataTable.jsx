@@ -1,6 +1,6 @@
 import React from "react";
 
-const THEME = "#4B499B";
+const THEME = "#5D4C29";
 
 export const TabButton = ({ label, active, onClick }) => (
   <button

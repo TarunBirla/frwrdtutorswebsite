@@ -122,16 +122,17 @@ const Sidebar = () => {
   return (
     <div
       className="w-64 min-h-screen flex flex-col shadow-xl"
-      style={{ backgroundColor: "#3C3A86" }}
+      style={{ backgroundColor: "#1C1C1C" }}
     >
       {/* Logo */}
-      <div className="px-6 py-5 bg-white border-b border-white/20">
-        <img
-          src="/image 1.png"
-          alt="logo"
-          className="h-5 w-auto object-cover"
-        />
-      </div>
+     <div className="text-[#d3b372] Uppercase py-4 border-b border-white/20 flex flex-col items-center justify-center text-center gap-1">
+  <h4 className="text-2xl font-semibold tracking-[0.2em]">
+    FRWRD
+  </h4>
+  <h6 className="text-xl mt-1 tracking-[0.2em]">
+    TUTOR
+  </h6>
+</div>
 
       {/* Navigation */}
       <nav className="flex-1 mt-4 px-3 space-y-1">
@@ -150,8 +151,8 @@ const Sidebar = () => {
                   onClick={() => toggleMenu(item.name)}
                   className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isMenuActive
-                      ? "bg-white text-[#3C3A86]"
-                      : "text-white/80 hover:bg-white/15 hover:text-white"
+                      ? "bg-[#5D4C29] text-white"
+                      : "text-white hover:bg-[#5D4C29] hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -175,8 +176,8 @@ const Sidebar = () => {
                         className={({ isActive }) =>
                           `block px-4 py-2 rounded-lg text-sm transition-all ${
                             isActive
-                              ? "bg-white text-[#3C3A86] font-medium"
-                              : "text-white/70 hover:bg-white/10 hover:text-white"
+                              ? "bg-[#5D4C29] text-white font-medium"
+                              : "text-white hover:bg-[#5D4C29] hover:text-white"
                           }`
                         }
                       >
@@ -196,8 +197,8 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? "bg-white text-[#3C3A86] shadow-md"
-                    : "text-white/80 hover:bg-white/15 hover:text-white"
+                    ? "bg-[#5D4C29] text-white shadow-md"
+                    : "text-white hover:bg-[#5D4C29] hover:text-white"
                 }`
               }
             >
@@ -212,7 +213,7 @@ const Sidebar = () => {
       <div className="px-3 pb-5">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:bg-red-500 hover:text-white transition-all duration-200"
+          className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-white hover:bg-red-500 hover:text-white transition-all duration-200"
         >
           <LogOut size={18} />
           Logout

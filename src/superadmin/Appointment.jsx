@@ -217,7 +217,7 @@ const Appointment = () => {
 
                 <main className="p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-[#3C3A86] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-[#5D4C29] flex items-center justify-center">
                             <CalendarDays className="text-white" />
                         </div>
 
@@ -346,7 +346,7 @@ const Appointment = () => {
                             <div className="flex gap-3 mb-6">
                                 <button
                                     onClick={handleSearch}
-                                    className="bg-[#3C3A86] text-white px-4 py-2 rounded-xl flex items-center gap-2"
+                                    className="bg-[#5D4C29] text-white px-4 py-2 rounded-xl flex items-center gap-2"
                                 >
                                     <Search size={16} />
                                     Search
@@ -365,7 +365,7 @@ const Appointment = () => {
                         {/* <div className="flex gap-3 mb-6">
                             <button
                                 onClick={handleSearch}
-                                className="bg-[#3C3A86] text-white px-4 py-2 rounded-xl flex items-center gap-2"
+                                className="bg-[#5D4C29] text-white px-4 py-2 rounded-xl flex items-center gap-2"
                             >
                                 <Search size={16} />
                                 Search
