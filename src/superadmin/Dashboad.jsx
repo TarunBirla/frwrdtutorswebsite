@@ -35,13 +35,13 @@ import {
     Star,
 } from "lucide-react";
 
-const BRAND = "#5D4C29";
+const BRAND = "#3C3A86";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 
 const COLORS = [
-    "#5D4C29",
+    "#3C3A86",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -53,7 +53,7 @@ const cardIcons = {
     "Total Clients": {
         icon: Users,
         bg: "#EEF2FF",
-        color: "#5D4C29",
+        color: "#3C3A86",
     },
 
     "Total Students": {
@@ -77,7 +77,7 @@ const cardIcons = {
     "Approved Tutors": {
         icon: CheckCircle,
         bg: "#EEF2FF",
-        color: "#5D4C29",
+        color: "#3C3A86",
     },
 
     "Pending Tutors": {
@@ -89,7 +89,7 @@ const cardIcons = {
     Appointments: {
         icon: CalendarDays,
         bg: "#EEF2FF",
-        color: "#5D4C29",
+        color: "#3C3A86",
     },
 
     "Completed Lessons": {
@@ -466,7 +466,9 @@ console.log("paymentsTrendData", paymentsTrendData);
     .slice(-5);
     const appointmentTrend = Object.entries(
         dashboard.appointments?.monthlyLessonsTrend || {},
-    ).map(([month, value]) => ({ month, value }));
+    ).map(([month, value]) => ({ month, value }))
+    .sort((a, b) => new Date(a.month) - new Date(b.month))
+    .slice(-10);;
     
    const lessonTopicsData = Object.entries(
     dashboard.appointments?.lessonTopics || {}
@@ -491,7 +493,7 @@ console.log("paymentsTrendData", paymentsTrendData);
                             >
                                 Admin Overview
                             </p>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-[#3C3A86]">
                                 {activeTab} Dashboard
                             </h1>
                         </div>
@@ -810,15 +812,16 @@ console.log("paymentsTrendData", paymentsTrendData);
                                                     stroke="#F3F4F6"
                                                     vertical={false}
                                                 />
-                                                <XAxis
-                                                    dataKey="month"
-                                                    tick={{
-                                                        fontSize: 11,
-                                                        fill: GRAY,
-                                                    }}
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                />
+                                                                                             <XAxis
+    dataKey="month"
+    interval={0}
+    angle={-45}
+    textAnchor="end"
+    height={60}
+    tick={{ fontSize: 10, fill: GRAY }}
+    axisLine={false}
+    tickLine={false}
+/>
                                                 <YAxis
                                                     tick={{
                                                         fontSize: 11,

@@ -29,15 +29,15 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND       = "#5D4C29";
+const BRAND       = "#3C3A86";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY        = "#6B7280";
 const WHITE       = "#ffffff";
-const COLORS      = ["#5D4C29", "#10B981", "#F59E0B", "#EF4444", "#06B6D4", "#8B5CF6"];
+const COLORS      = ["#3C3A86", "#10B981", "#F59E0B", "#EF4444", "#06B6D4", "#8B5CF6"];
 
 // ─── Card meta ───────────────────────────────────────────
 const CARD_META = {
-    "Total Clients":     { icon: Users,           bg: "#EEF2FF", color: "#5D4C29" },
+    "Total Clients":     { icon: Users,           bg: "#EEF2FF", color: "#3C3A86" },
     "Live Clients":      { icon: UserCheck,        bg: "#ECFDF5", color: "#059669" },
     "Dormant Clients":   { icon: UserX,            bg: "#FEF2F2", color: "#DC2626" },
     "New This Month":    { icon: UserPlus,         bg: "#FFF7ED", color: "#EA580C" },
@@ -189,7 +189,7 @@ const ClientsDashboard = () => {
                             <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: GRAY }}>
                                 Clients Overview
                             </p>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-[#3C3A86]">
                                 {activeTab} — Clients Dashboard
                             </h1>
                         </div>

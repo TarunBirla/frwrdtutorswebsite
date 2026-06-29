@@ -29,13 +29,13 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#5D4C29";
+const BRAND = "#3C3A86";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 
 const COLORS = [
-    "#5D4C29",
+    "#3C3A86",
     "#10B981",
     "#EF4444",
     "#F59E0B",
@@ -45,7 +45,7 @@ const COLORS = [
 
 const STATUS_COLORS = {
     completed: "#10B981",
-    planned: "#5D4C29",
+    planned: "#3C3A86",
     cancelled: "#EF4444",
     pending: "#F59E0B",
     rescheduled: "#8B5CF6",
@@ -61,10 +61,10 @@ const CARD_META = {
     "Total Appointments": {
         icon: CalendarDays,
         bg: "#EEF2FF",
-        color: "#5D4C29",
+        color: "#3C3A86",
     },
     Completed: { icon: CheckCircle, bg: "#ECFDF5", color: "#059669" },
-    Planned: { icon: Clock3, bg: "#EEF2FF", color: "#5D4C29" },
+    Planned: { icon: Clock3, bg: "#EEF2FF", color: "#3C3A86" },
     Cancelled: { icon: XCircle, bg: "#FEF2F2", color: "#DC2626" },
     "Completion Rate": { icon: TrendingUp, bg: "#F5F3FF", color: "#7C3AED" },
     "Online Lessons": { icon: Monitor, bg: "#ECFEFF", color: "#0891B2" },
@@ -292,10 +292,10 @@ const AppointmentsDashboard = () => {
                   title: "Online Lessons",
                   value: dashboard.overview?.onlineLessons,
               },
-              {
-                  title: "Offline Lessons",
-                  value: dashboard.overview?.offlineLessons,
-              },
+            //   {
+            //       title: "Offline Lessons",
+            //       value: dashboard.overview?.offlineLessons,
+            //   },
               {
                   title: "Avg Lesson Duration",
                   value: `${dashboard.overview?.averageLessonDuration ?? 0} Hrs`,
@@ -318,7 +318,7 @@ const AppointmentsDashboard = () => {
                             >
                                 Appointments Overview
                             </p>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-[#3C3A86]">
                                 {activeTab} — Appointments Dashboard
                             </h1>
                         </div>
@@ -396,6 +396,76 @@ const AppointmentsDashboard = () => {
                                     />
                                 ))}
                             </div>
+
+                            <SectionCard
+    title="Latest Upcoming Appointments"
+    subtitle="Next 5 Upcoming Lessons"
+    className="mb-6"
+>
+    {dashboard?.latestUpcomingAppointments?.length ? (
+        <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+                <thead>
+                    <tr className="border-b bg-gray-50">
+                        <th className="px-4 py-3 text-left">Tutor</th>
+                        <th className="px-4 py-3 text-left">Topic</th>
+                        <th className="px-4 py-3 text-left">Service</th>
+                        <th className="px-4 py-3 text-left">
+                            Start Time
+                        </th>
+                        <th className="px-4 py-3 text-left">
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {dashboard.latestUpcomingAppointments.map(
+                        (item) => (
+                            <tr
+                                key={item.id}
+                                className="border-b hover:bg-gray-50"
+                            >
+                                <td className="px-4 py-3 font-medium">
+                                    {item.tutor}
+                                </td>
+
+                                <td className="px-4 py-3">
+                                    {item.topic}
+                                </td>
+
+                                <td className="px-4 py-3">
+                                    {item.service}
+                                </td>
+
+                                <td className="px-4 py-3">
+                                    {new Date(
+                                        item.start_time
+                                    ).toLocaleString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    })}
+                                </td>
+
+                                <td className="px-4 py-3">
+                                    <StatusBadge
+                                        status={item.status}
+                                    />
+                                </td>
+                            </tr>
+                        )
+                    )}
+                </tbody>
+            </table>
+        </div>
+    ) : (
+        <EmptyState text="No Upcoming Appointments" />
+    )}
+</SectionCard>
 
                             {/* ── Row 1: Status Pie + Top 15 Topics Bar ── */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">

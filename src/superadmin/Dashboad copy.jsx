@@ -462,7 +462,7 @@ const Dashboard = () => {
                             >
                                 Admin Overview
                             </p>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-[#3C3A86]">
                                 {activeTab} Dashboard
                             </h1>
                         </div>

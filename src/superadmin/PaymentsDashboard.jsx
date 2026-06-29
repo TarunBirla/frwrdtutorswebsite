@@ -29,12 +29,12 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#5D4C29";
+const BRAND = "#3C3A86";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 const COLORS = [
-    "#5D4C29",
+    "#3C3A86",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -254,7 +254,7 @@ const PaymentsDashboard = () => {
                             >
                                 Finance · Payments
                             </p>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-[#3C3A86]">
                                 {activeTab} — Payments Dashboard
                             </h1>
                         </div>
@@ -330,7 +330,7 @@ const PaymentsDashboard = () => {
                                                 width: 4,
                                                 height: 20,
                                                 borderRadius: 2,
-                                                background: "#5D4C29",
+                                                background: "#3C3A86",
                                             }}
                                         />
                                         <span className="text-sm font-semibold text-gray-700">
@@ -341,7 +341,7 @@ const PaymentsDashboard = () => {
                                         className="text-sm font-bold px-3 py-1 rounded-full"
                                         style={{
                                             background: "#FFF7ED",
-                                            color: "#5D4C29",
+                                            color: "#3C3A86",
                                         }}
                                     >
                                         {avgPaymentTime} Days
@@ -355,7 +355,7 @@ const PaymentsDashboard = () => {
                                         className="h-3 rounded-full transition-all duration-700"
                                         style={{
                                             width: `${Math.min(avgPaymentTime, 100)}%`,
-                                            background: "#5D4C29",
+                                            background: "#3C3A86",
                                         }}
                                     />
                                 </div>

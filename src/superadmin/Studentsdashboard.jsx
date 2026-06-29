@@ -28,12 +28,12 @@ import {
 } from "lucide-react";
 
 // ─── Theme ───────────────────────────────────────────────
-const BRAND = "#5D4C29";
+const BRAND = "#3C3A86";
 const BRAND_LIGHT = "#EEEDFE";
 const GRAY = "#6B7280";
 const WHITE = "#ffffff";
 const COLORS = [
-    "#5D4C29",
+    "#3C3A86",
     "#10B981",
     "#F59E0B",
     "#EF4444",
@@ -43,7 +43,7 @@ const COLORS = [
 
 // ─── Card meta ───────────────────────────────────────────
 const CARD_META = {
-    "Total Students": { icon: GraduationCap, bg: "#EEF2FF", color: "#5D4C29" },
+    "Total Students": { icon: GraduationCap, bg: "#EEF2FF", color: "#3C3A86" },
     "New This Month": { icon: UserPlus, bg: "#FFF7ED", color: "#EA580C" },
     "Photo Coverage": { icon: Camera, bg: "#F5F3FF", color: "#7C3AED" },
     "Paying Clients": { icon: CreditCard, bg: "#ECFDF5", color: "#059669" },
@@ -249,7 +249,7 @@ const StudentsDashboard = () => {
                             >
                                 Students Overview
                             </p>
-                            <h1 className="text-2xl font-bold text-gray-900">
+                            <h1 className="text-2xl font-bold text-[#3C3A86]">
                                 {activeTab} — Students Dashboard
                             </h1>
                         </div>

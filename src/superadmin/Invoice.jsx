@@ -62,7 +62,7 @@ const Invoice = () => {
           <div className="flex items-center gap-3 mb-6">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: "#5D4C29" }}
+              style={{ backgroundColor: "#3C3A86" }}
             >
               <FileText size={20} className="text-white" />
             </div>
@@ -90,7 +90,7 @@ const Invoice = () => {
 
               <div
                 className="text-sm font-medium px-4 py-2 rounded-xl"
-                style={{ backgroundColor: "#5D4C2918", color: "#5D4C29" }}
+                style={{ backgroundColor: "#3C3A8618", color: "#3C3A86" }}
               >
                 Total: {totalRecords.toLocaleString()} invoices
               </div>
@@ -101,7 +101,7 @@ const Invoice = () => {
               <div className="flex flex-col items-center justify-center py-16 text-gray-400">
                 <div
                   className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin mb-3"
-                  style={{ borderColor: "#5D4C29", borderTopColor: "transparent" }}
+                  style={{ borderColor: "#3C3A86", borderTopColor: "transparent" }}
                 />
                 <p className="text-sm">Loading invoices...</p>
               </div>
@@ -115,7 +115,7 @@ const Invoice = () => {
                           <th
                             key={col}
                             className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide"
-                            style={{ color: "#5D4C29" }}
+                            style={{ color: "#3C3A86" }}
                           >
                             {col}
                           </th>
@@ -140,7 +140,7 @@ const Invoice = () => {
                           key={invoice.id}
                           className="border-t border-gray-50 hover:bg-[#f5f5fb]/60 transition-colors"
                         >
-                          <td className="px-4 py-3 font-medium text-[#5D4C29]">
+                          <td className="px-4 py-3 font-medium text-[#3C3A86]">
                             {invoice.display_id}
                           </td>
 
