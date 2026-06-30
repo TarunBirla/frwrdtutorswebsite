@@ -34,40 +34,74 @@ const Students = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [search, setSearch] = useState("");
 
-  const fetchStudents = async (brand, page = 1) => {
-    setLoading(true);
-    try {
-      const base =
-        brand === "JLT"
-          ? "https://api.frwrdtutors.com/api/admin/all-studentsBranch1017"
-          : "https://api.frwrdtutors.com/api/admin/all-studentsBranch28866";
-      const { data } = await axios.get(`${base}?page=${page}`);
-      setStudents(data.students || []);
-      setTotalRecords(data.count || 0);
-      setCurrentPage(page);
-    } catch (err) {
-      console.error(err);
-      setStudents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchStudents = async (
+  brand,
+  page = 1,
+  searchText = ""
+) => {
 
-  useEffect(() => {
-    fetchStudents("JLT", 1);
-  }, []);
+  setLoading(true);
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setSearch("");
-    fetchStudents(tab, 1);
-  };
+  try {
 
-  const filteredStudents = students.filter((student) =>
-    `${student.first_name} ${student.last_name} ${student.email}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+    const base =
+      brand === "JLT"
+        ? "https://api.frwrdtutors.com/api/admin/all-studentsBranch1017"
+        : "https://api.frwrdtutors.com/api/admin/all-studentsBranch28866";
+
+    const { data } = await axios.get(base, {
+      params: {
+        page,
+        search: searchText,
+      },
+    });
+
+    setStudents(data.students || []);
+    setTotalRecords(data.count || 0);
+    setCurrentPage(page);
+
+  } catch (err) {
+
+    console.log(err);
+    setStudents([]);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
+
+useEffect(() => {
+
+  const timer = setTimeout(() => {
+
+    fetchStudents(
+      activeTab,
+      1,
+      search
+    );
+
+  }, 300);
+
+  return () => clearTimeout(timer);
+
+}, [activeTab, search]);
+
+ const handleTabChange = (tab) => {
+
+  setActiveTab(tab);
+  setCurrentPage(1);
+  setSearch("");
+
+};
+
+  // const filteredStudents = students.filter((student) =>
+  //   `${student.first_name} ${student.last_name} ${student.email}`
+  //     .toLowerCase()
+  //     .includes(search.toLowerCase())
+  // );
 
   const totalPages = Math.ceil(totalRecords / 100);
 
@@ -131,17 +165,23 @@ const Students = () => {
             {/* Table */}
             <DataTable
               columns={COLUMNS}
-              rows={filteredStudents}
+              rows={students}
               loading={loading}
               emptyMessage="No students found for this branch"
             />
 
             {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(p) => fetchStudents(activeTab, p)}
-            />
+           <Pagination
+  currentPage={currentPage}
+  totalPages={Math.ceil(totalRecords / 100)}
+  onPageChange={(page) =>
+    fetchStudents(
+      activeTab,
+      page,
+      search
+    )
+  }
+/>
           </div>
         </main>
       </div>

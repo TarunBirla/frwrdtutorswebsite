@@ -23,21 +23,29 @@ const Invoice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
-  const fetchInvoices = async (brand, page = 1) => {
+  const fetchInvoices = async (brand, page = 1, searchText = "") => {
     setLoading(true);
+
     try {
       const base =
         brand === "JLT"
           ? "https://api.frwrdtutors.com/api/admin/all-invoicesBranch1017"
           : "https://api.frwrdtutors.com/api/admin/all-invoicesBranch28866";
-      const { data } = await axios.get(`${base}?page=${page}`);
+
+      const { data } = await axios.get(base, {
+        params: {
+          page,
+          search: searchText,
+        },
+      });
+
       setInvoices(data.invoices || []);
       setTotalRecords(data.count || 0);
       setCurrentPage(page);
-      setActiveTab(brand);
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -45,8 +53,12 @@ const Invoice = () => {
   };
 
   useEffect(() => {
-    fetchInvoices("JLT", 1);
-  }, []);
+    const timer = setTimeout(() => {
+      fetchInvoices(activeTab, 1, search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [activeTab, search]);
 
   const totalPages = Math.ceil(totalRecords / 100);
 
@@ -83,7 +95,11 @@ const Invoice = () => {
                     key={t.key}
                     label={t.label}
                     active={activeTab === t.key}
-                    onClick={() => fetchInvoices(t.key, 1)}
+                    onClick={() => {
+                      setActiveTab(t.key);
+                      setCurrentPage(1);
+                      setSearch("");
+                    }}
                   />
                 ))}
               </div>
@@ -101,26 +117,43 @@ const Invoice = () => {
               <div className="flex flex-col items-center justify-center py-16 text-gray-400">
                 <div
                   className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin mb-3"
-                  style={{ borderColor: "#3C3A86", borderTopColor: "transparent" }}
+                  style={{
+                    borderColor: "#3C3A86",
+                    borderTopColor: "transparent",
+                  }}
                 />
                 <p className="text-sm">Loading invoices...</p>
               </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-gray-100">
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Search Invoice, Client, Email, Status..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full md:w-96 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#3C3A86]"
+                  />
+                </div>
                 <table className="w-full text-sm">
                   <thead>
                     <tr style={{ backgroundColor: "#f5f5fb" }}>
-                      {["Invoice", "Client", "Email", "Amount", "Status", "Date"].map(
-                        (col) => (
-                          <th
-                            key={col}
-                            className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide"
-                            style={{ color: "#3C3A86" }}
-                          >
-                            {col}
-                          </th>
-                        )
-                      )}
+                      {[
+                        "Invoice",
+                        "Client",
+                        "Email",
+                        "Amount",
+                        "Status",
+                        "Date",
+                      ].map((col) => (
+                        <th
+                          key={col}
+                          className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide"
+                          style={{ color: "#3C3A86" }}
+                        >
+                          {col}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
 
@@ -175,7 +208,7 @@ const Invoice = () => {
                                     day: "2-digit",
                                     month: "short",
                                     year: "numeric",
-                                  }
+                                  },
                                 )
                               : "—"}
                           </td>
@@ -190,8 +223,8 @@ const Invoice = () => {
             {/* Pagination */}
             <Pagination
               currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(p) => fetchInvoices(activeTab, p)}
+              totalPages={Math.ceil(totalRecords / 100)}
+              onPageChange={(page) => fetchInvoices(activeTab, page, search)}
             />
           </div>
         </main>
