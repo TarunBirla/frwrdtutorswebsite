@@ -69,9 +69,31 @@ const Packages = () => {
 
   const navigate = useNavigate();
   const [packageData, setPackageData] = useState(null);
- 
+  const [paymentInfo, setPaymentInfo] = useState(null);
+  const [previousPurchases, setPreviousPurchases] = useState([]);
 
- 
+  useEffect(() => {
+    const fetchPreviousPurchases = async () => {
+      try {
+        const rawUser = localStorage.getItem("userdata");
+        if (!rawUser) return;
+
+        const user = JSON.parse(rawUser);
+
+        const res = await http.get(`/clientbookdata/${user.clientid}`);
+
+        console.log("Previous Purchases:", res.data);
+
+        if (res.data?.success && Array.isArray(res.data.data)) {
+          setPreviousPurchases(res.data.data);
+        }
+      } catch (err) {
+        console.error("Previous Purchases API Error:", err);
+      }
+    };
+
+    fetchPreviousPurchases();
+  }, []);
 
   useEffect(() => {
     const storedData = localStorage.getItem("packageFormData");
@@ -104,7 +126,7 @@ const Packages = () => {
   const [lessonCount, setLessonCount] = useState(1);
   const [studentName, setStudentName] = useState("");
 
-  const [paymentInfo, setPaymentInfo] = useState(null);
+  // const [paymentInfo, setPaymentInfo] = useState(null);
 
   useEffect(() => {
     const fetchPaymentStatus = async () => {
@@ -190,7 +212,43 @@ const Packages = () => {
     return paidCount >= 1 && unpaidCount >= 1;
   };
 
-  
+  // Only for SINGLE student flow (studyType is null)
+  const isRepeatSameSubjectYear = () => {
+    const isSingleStudent = packageData?.studyType == null;
+    if (!isSingleStudent) return false;
+    if (!packageData) return false;
+    if (!previousPurchases.length) return false;
+
+    const currentName = packageData?.name1?.toLowerCase()?.trim();
+    const currentProgram = packageData?.program || "";
+    const currentSubjects = [...(packageData?.subject || [])].sort();
+
+    if (!currentName || !currentProgram || currentSubjects.length === 0)
+      return false;
+
+    return previousPurchases.some((purchase) => {
+      try {
+        const parsed = JSON.parse(purchase.packageForm);
+        const prevData = parsed?.packageFormData;
+        if (!prevData) return false;
+
+        // Only compare against previous SINGLE student bookings
+        if (prevData?.studyType != null) return false;
+
+        const prevName = prevData?.name1?.toLowerCase()?.trim();
+        const prevProgram = prevData?.program || "";
+        const prevSubjects = [...(prevData?.subject || [])].sort();
+
+        if (prevName !== currentName) return false;
+        if (prevProgram !== currentProgram) return false;
+        if (prevSubjects.length !== currentSubjects.length) return false;
+
+        return prevSubjects.every((s, i) => s === currentSubjects[i]);
+      } catch (e) {
+        return false;
+      }
+    });
+  };
 
   useEffect(() => {
     if (packageData?.name1) {
@@ -281,7 +339,27 @@ const Packages = () => {
     return Math.round(num * 0.8); // 80% = 20% OFF
   };
 
-  
+  // Check if both students have the exact same subjects
+  // Check if both students have the exact same subjects AND same year/program
+  const areSubjectsSame = () => {
+    const sub1 = packageData?.student1?.subject || [];
+    const sub2 = packageData?.student2?.subject || [];
+
+    if (sub1.length === 0 || sub2.length === 0) return false;
+    if (sub1.length !== sub2.length) return false;
+
+    const sorted1 = [...sub1].sort();
+    const sorted2 = [...sub2].sort();
+
+    const isSubjectSame = sorted1.every((s, i) => s === sorted2[i]);
+
+    const program1 = packageData?.student1?.program || "";
+    const program2 = packageData?.student2?.program || "";
+
+    const isYearSame = program1 && program2 && program1 === program2;
+
+    return isSubjectSame && isYearSame;
+  };
 
   // Final mapping
   // filteredPackages = filteredPackages.map((pkg) => ({
@@ -297,16 +375,20 @@ const Packages = () => {
 
     const isIndividual = packageData?.studyType === "no";
 
-    // Rule 1: Individual → NO discount ever (removed)
-    // (individualDiscount variable removed completely)
+    // Rule 1: Individual → studentType based AND same subjects
+    const individualDiscount =
+      isIndividual && studentType === "2" && areSubjectsSame();
 
-    // Rule 2: Group / Mixed → payment based discount only
+    // Rule 2: Group / Mixed → payment based
     const paymentDiscount =
       !isIndividual &&
       packageData?.studyType === "yes" &&
       shouldApplyDiscount();
 
-    if (paymentDiscount) {
+    // Rule 3: Single student → repeat booking with same subject & same year
+    const singleRepeatDiscount = isRepeatSameSubjectYear();
+
+    if (individualDiscount || paymentDiscount || singleRepeatDiscount) {
       finalPrice = applySecondStudentDiscount(pkg.total);
     }
 
@@ -912,14 +994,15 @@ const Packages = () => {
                         //   studentName,
                         //   lessonCounts,
                         // };
+                        const singleRepeatDiscount = isRepeatSameSubjectYear();
 
                         const formDataObject = {
                           packageNames: {
                             ...packageNames,
                             total:
-                              studentType === "2" 
-                              
-                                ? packageNames.total
+                              (studentType === "2" && areSubjectsSame()) ||
+                              singleRepeatDiscount
+                                ? applySecondStudentDiscount(packageNames.total)
                                 : packageNames.total,
                           },
                           packageName,

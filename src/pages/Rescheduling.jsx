@@ -142,7 +142,23 @@ const Packages = () => {
   twoDaysLater.setDate(today.getDate() + 2);
 
   // 1️⃣ Flatten appointments for pagination
-  const flatAppointments = appointments.map((appt) => ({
+  // const flatAppointments = appointments.map((appt) => ({
+  //   ...appt,
+  //   pkgId: appt.db?.pkg_id,
+  //   packageName: packageNames[appt.db?.pkg_id] || "Unknown Package",
+  // }));
+  const flatAppointments = appointments
+  .filter((appt) => {
+    const now = new Date();
+    const classStart = new Date(appt.start);
+
+    const diffMs = classStart - now;
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    // Sirf wahi appointment show hogi jo 48 hours se zyada future me hai
+    return diffMs > 0 && diffHours > 48;
+  })
+  .map((appt) => ({
     ...appt,
     pkgId: appt.db?.pkg_id,
     packageName: packageNames[appt.db?.pkg_id] || "Unknown Package",
@@ -227,9 +243,17 @@ const Packages = () => {
 
                   {pkg.items.map((appt, index) => {
                     const tutor = appt.service;
+                    
                     const contractor = serviceDetails[tutor.id]?.conjobs?.[0];
                     const contractorName = contractor?.name || tutor.name;
                     const contractorNameid = contractor?.contractor;
+                    // Name se initials nikalo
+              const nameParts = contractorName.trim().split(/\s+/);
+
+              const initials =
+                nameParts.length >= 2
+                  ? `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`
+                  : nameParts[0]?.charAt(0) || "T";
                     const isExpanded =
                       expandedIndex === `${pkg.pkgId}-${index}`;
 
@@ -278,11 +302,18 @@ const Packages = () => {
                         className="bg-white rounded-xl p-4 mb-4 shadow-md"
                       >
                         <div className="flex items-start gap-4">
-                          <img
-                            src="/tutor2.png"
-                            alt={contractorName}
-                            className="w-[73px] h-[73px] rounded-[4px] object-cover"
-                          />
+                          {tutor?.photo ? (
+                            <img
+                              src={tutor.photo}
+                              alt={contractorName}
+                              className="w-[73px] h-[73px] rounded-[4px] object-cover"
+                            />
+                          ) : (
+                           <div className="w-[73px] h-[73px] rounded-[4px] bg-[#17215F] flex items-center justify-center text-white  text-[52px]">
+                            
+                              {initials.toUpperCase()}
+                            </div>
+                          )}
                           <div className="flex-1">
                             <h3 className="font-bold text-[14px] text-[#17215F] mb-1">
                               {contractorName}

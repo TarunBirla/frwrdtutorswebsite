@@ -72,7 +72,6 @@ const CheckoutPage = () => {
 
   const [studentDetails, setStudentDetails] = useState([]);
 
-
   let userData = null;
 
   try {
@@ -854,29 +853,25 @@ const CheckoutPage = () => {
   //   return Math.max(0, numericTotal - discountNum);
   // };
   const getStudentFinalTotal = (student, index) => {
-  const rawTotal = student.lessonData?.packageNames?.total ?? 0;
+    const rawTotal = student.lessonData?.packageNames?.total ?? 0;
 
-  const numericTotal =
-    Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
+    const numericTotal = Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
 
-  const discountNum =
-    Number(studentDiscounts[index]) || 0;
+    const discountNum = Number(studentDiscounts[index]) || 0;
 
-  const final = Math.max(0, numericTotal - discountNum);
+    const final = Math.max(0, numericTotal - discountNum);
 
-  console.log(
-    `💰 Student ${index + 1} Total:`,
-    numericTotal,
-    "-",
-    discountNum,
-    "=",
-    final
-  );
+    console.log(
+      `💰 Student ${index + 1} Total:`,
+      numericTotal,
+      "-",
+      discountNum,
+      "=",
+      final,
+    );
 
-  return final;
-};
-
-  
+    return final;
+  };
 
   // let grandTotal = 0;
 
@@ -891,7 +886,6 @@ const CheckoutPage = () => {
   //   const numericTotal = Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
   //  const discountNum = Number(studentDiscounts[0]) || 0;
 
-
   //   grandTotal = Math.max(0, numericTotal - discountNum);
 
   //   console.log("finalNumeric (number):", grandTotal);
@@ -902,28 +896,27 @@ const CheckoutPage = () => {
 
   let grandTotal = 0;
 
-// ================= INDIVIDUAL =================
-if (packageFormData.studyType === "no") {
-  grandTotal = studentsData.reduce((sum, student, index) => {
-    return sum + getStudentFinalTotal(student, index);
-  }, 0);
+  // ================= INDIVIDUAL =================
+  if (packageFormData.studyType === "no") {
+    grandTotal = studentsData.reduce((sum, student, index) => {
+      return sum + getStudentFinalTotal(student, index);
+    }, 0);
 
-  console.log("✅ INDIVIDUAL GRAND TOTAL:", grandTotal);
-}
+    console.log("✅ INDIVIDUAL GRAND TOTAL:", grandTotal);
+  }
 
-// ================= GROUP / SINGLE =================
-else {
-  const rawTotal = lessiondata?.packageNames?.total ?? 0;
+  // ================= GROUP / SINGLE =================
+  else {
+    const rawTotal = lessiondata?.packageNames?.total ?? 0;
 
-  const numericTotal =
-    Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
+    const numericTotal = Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
 
-  const discountNum = Number(studentDiscounts[0]) || 0;
+    const discountNum = Number(studentDiscounts[0]) || 0;
 
-  grandTotal = Math.max(0, numericTotal - discountNum);
+    grandTotal = Math.max(0, numericTotal - discountNum);
 
-  console.log("✅ GROUP/SINGLE TOTAL:", grandTotal);
-}
+    console.log("✅ GROUP/SINGLE TOTAL:", grandTotal);
+  }
 
   console.log("Grand Total (number):", grandTotal);
 
@@ -931,38 +924,31 @@ else {
   const grandTotalFormatted = grandTotal.toLocaleString("en-US");
   console.log("Grand Total (formatted):", grandTotalFormatted);
 
-const getFinalPackageIds = () => {
-  let ids = [];
+  const getFinalPackageIds = () => {
+    let ids = [];
 
-  const studyType = packageFormData?.studyType;
+    const studyType = packageFormData?.studyType;
 
-  const studentsData =
-    JSON.parse(localStorage.getItem("studentsData")) || [];
+    const studentsData = JSON.parse(localStorage.getItem("studentsData")) || [];
 
-  // ================= INDIVIDUAL (MULTI) =================
-  if (studyType === "no" && studentsData.length > 0) {
-
-    ids = studentsData
-      .map((item) => item?.lessonData?.packageNames?.id)
-      .filter(Boolean);
-
-  }
-
-  // ================= SINGLE / GROUP =================
-  else {
-
-    const lesson =
-      JSON.parse(localStorage.getItem("lessonData")) || {};
-
-    if (lesson?.packageNames?.id) {
-      ids = [lesson.packageNames.id];
+    // ================= INDIVIDUAL (MULTI) =================
+    if (studyType === "no" && studentsData.length > 0) {
+      ids = studentsData
+        .map((item) => item?.lessonData?.packageNames?.id)
+        .filter(Boolean);
     }
 
-  }
+    // ================= SINGLE / GROUP =================
+    else {
+      const lesson = JSON.parse(localStorage.getItem("lessonData")) || {};
 
-  return ids;
-};
+      if (lesson?.packageNames?.id) {
+        ids = [lesson.packageNames.id];
+      }
+    }
 
+    return ids;
+  };
 
   const createOrder = async () => {
     setLoading(true);
@@ -981,28 +967,35 @@ const getFinalPackageIds = () => {
 
     console.log("Updated localStorage.lessonData:", lessiondata);
 
-    const matchedStudentIds = getMatchedStudentIds(
-  studentDetails,
-  lessiondata
-);
+    const matchedStudentIds = getMatchedStudentIds(studentDetails, lessiondata);
 
+    const packageIds = getFinalPackageIds();
 
-const packageIds = getFinalPackageIds();
-
-console.log("📦 FINAL PACKAGE IDS:", packageIds);
-
+    console.log("📦 FINAL PACKAGE IDS:", packageIds);
 
     try {
+      const bookingPayload = {
+        userdata: JSON.parse(localStorage.getItem("userdata")),
+        lessonData: JSON.parse(localStorage.getItem("lessonData")),
+        bookingdata: JSON.parse(localStorage.getItem("bookingdata")),
+        selectedTeachers: JSON.parse(localStorage.getItem("selectedTeachers")),
+        groupedByWeek: JSON.parse(localStorage.getItem("groupedByWeek")),
+        packageFormData: JSON.parse(localStorage.getItem("packageFormData")),
+        studentsData: JSON.parse(localStorage.getItem("studentsData")) || [],
+        BranchId: localStorage.getItem("BranchId"),
+        totalLesson: localStorage.getItem("totalLession"),
+      };
       const payload = {
         email: userData.email,
         // student_ids: userData?.studentdetails?.map((s) => s.id) || [],
         student_ids: matchedStudentIds || [],
         client_id: userData.clientid,
         appoint_ids: ["AP56789"],
-         package_ids: packageIds,  // 🔥 ADD THIS
+        package_ids: packageIds, // 🔥 ADD THIS
         amount: grandTotalFormatted,
         // amount: "0.041",
         branch_id: branchid,
+        booking_payload: bookingPayload,
       };
       console.log("payload", payload);
 
@@ -1145,8 +1138,7 @@ console.log("📦 FINAL PACKAGE IDS:", packageIds);
                   // remove commas, ₹ signs, spaces, etc.
                   const totalNum =
                     Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
-                 const discountNum = Number(studentDiscounts[0]) || 0;
-
+                  const discountNum = Number(studentDiscounts[0]) || 0;
 
                   return `${Math.max(0, totalNum - discountNum)}`;
                 })()}
@@ -1285,8 +1277,7 @@ console.log("📦 FINAL PACKAGE IDS:", packageIds);
                         // remove commas, ₹ signs, spaces, etc.
                         const totalNum =
                           Number(String(rawTotal).replace(/[^\d.-]/g, "")) || 0;
-                      const discountNum = Number(studentDiscounts[idx]) || 0;
-
+                        const discountNum = Number(studentDiscounts[idx]) || 0;
 
                         return `₹${Math.max(0, totalNum - discountNum)}`;
                       })()}
@@ -1404,7 +1395,184 @@ console.log("📦 FINAL PACKAGE IDS:", packageIds);
                 width="157px"
                 height="51px"
                 // onClick={(e)=>handleCheckout(e)}
-                onClick={createOrder}
+                onClick={() => {
+                  Swal.fire({
+                    width: 660,
+                    showConfirmButton: true,
+                    confirmButtonText: `
+      <span style="display:flex;align-items:center;justify-content:center;gap:10px; width:300px !important;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span >Continue</span>
+      </span>
+    `,
+                    confirmButtonColor: "#4F36D6",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    customClass: {
+                      popup: "payment-popup",
+                      confirmButton: "payment-btn",
+                    },
+                    html: `
+      <style>
+        .payment-popup { border-radius: 20px !important;  }
+        .payment-btn {
+          border-radius: 10px !important;
+          font-size: 16px !important;
+          font-weight: 700 !important;
+          padding: 13px 0 !important;
+          width: 62% !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+      </style>
+
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; text-align: center;">
+
+        <!-- Lock Icon with green check badge -->
+        <div style="position:relative; width:70px; height:70px; margin:0 auto 14px;">
+          <div style="
+            width:70px; height:70px; border-radius:50%;
+            border:2.5px solid #5A3FE7;
+            display:flex; align-items:center; justify-content:center;
+            color:#5A3FE7;
+          ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5A3FE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div style="
+            position:absolute; bottom:2px; right:2px;
+            width:22px; height:22px; background:#22c55e;
+            border-radius:50%; border:2px solid #fff;
+            display:flex; align-items:center; justify-content:center;
+          ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h2 style="margin:0 0 6px; font-size:22px; font-weight:700; color:#111827;">
+          Continue to Secure Payment
+        </h2>
+        <p style="font-size:14px; color:#6B7280; line-height:1.5; margin:0 0 16px;">
+          You will now be redirected to your bank's secure payment page<br>to complete your payment.
+        </p>
+
+        <!-- Warning Box -->
+        <div style="
+          border:2px solid #F6D98A; border-radius:14px;
+          padding:14px 16px; background:#FFFEF5; margin-bottom:12px;
+        ">
+          <!-- IMPORTANT header -->
+          <div style="
+            display:flex; align-items:center; justify-content:center;
+            gap:10px; font-size:17px; font-weight:800; color:#1F2937; margin-bottom:12px;
+          ">
+            <div style="
+              width:44px; height:44px; background:#F5A623; border-radius:50%;
+              display:flex; align-items:center; justify-content:center; flex-shrink:0;
+            ">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            IMPORTANT – DO NOT:
+          </div>
+
+          <!-- 3 Action Icons -->
+          <div style="display:flex; align-items:center; justify-content:center;">
+            <!-- Refresh -->
+            <div style="flex:1; text-align:center; padding:4px 8px;">
+              <div style="
+                width:44px; height:44px; border-radius:50%; background:#ECEAF9;
+                display:flex; align-items:center; justify-content:center; margin:0 auto 6px;
+              ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A3FE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              </div>
+              <div style="font-size:11px; font-weight:800; color:#1F2937; letter-spacing:0.3px;">REFRESH</div>
+            </div>
+            <!-- Separator -->
+            <div style="width:1px; height:56px; background:#E5E7EB; flex-shrink:0;"></div>
+            <!-- Close Browser -->
+            <div style="flex:1; text-align:center; padding:4px 8px;">
+              <div style="
+                width:44px; height:44px; border-radius:50%; background:#ECEAF9;
+                display:flex; align-items:center; justify-content:center; margin:0 auto 6px;
+              ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A3FE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>
+              </div>
+              <div style="font-size:11px; font-weight:800; color:#1F2937; letter-spacing:0.3px;">CLOSE BROWSER</div>
+            </div>
+            <!-- Separator -->
+            <div style="width:1px; height:56px; background:#E5E7EB; flex-shrink:0;"></div>
+            <!-- Navigate Away -->
+            <div style="flex:1; text-align:center; padding:4px 8px;">
+              <div style="
+                width:44px; height:44px; border-radius:50%; background:#ECEAF9;
+                display:flex; align-items:center; justify-content:center; margin:0 auto 6px;
+              ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A3FE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              </div>
+              <div style="font-size:11px; font-weight:800; color:#1F2937; letter-spacing:0.3px;">NAVIGATE AWAY</div>
+            </div>
+          </div>
+
+          <!-- Warning note -->
+          <div style="
+            margin-top:12px; background:#FFF7D8;
+            padding:10px 14px; border-radius:10px;
+            font-size:14px; font-weight:600; color:#1F2937; line-height:1.5;
+          ">
+            Do not refresh, close your browser, or navigate away
+            until <span style="color:#4F36D6;">your payment is successful.</span>
+          </div>
+        </div>
+
+        <!-- Delay Info Box -->
+        <div style="
+          display:flex; align-items:center; gap:14px;
+          background:#F3F2FC; border-radius:12px;
+          padding:12px 14px; margin-bottom:10px; text-align:left;
+        ">
+          <div style="
+            width:48px; height:48px; border-radius:50%; background:#DDDAF4;
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+          ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5A3FE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><circle cx="16" cy="16" r="3"></circle><line x1="16" y1="14.5" x2="16" y2="16.5"></line><line x1="14.5" y1="16" x2="16" y2="16"></line></svg>
+          </div>
+          <div style="font-size:14px; color:#374151; line-height:1.5;">
+            Leaving the payment process before it is complete
+            <strong>may cause your payment to fail or delay</strong>
+            your booking confirmation.
+          </div>
+        </div>
+
+        <!-- Security -->
+        <div style="
+          display:flex; align-items:center; gap:14px;
+          padding:4px 0 12px; text-align:left;
+        ">
+          <div style="flex-shrink:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5A3FE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><rect x="9" y="11" width="6" height="5" rx="1"></rect><path d="M12 11V8a2 2 0 0 0-2-2"></path></svg>
+          </div>
+          <div style="font-size:14px; color:#374151; line-height:1.5;">
+            Your payment information is secure and encrypted.<br>
+            We never store or share your bank details.
+          </div>
+        </div>
+
+        <hr style="border:none; border-top:1px solid #EAEAEA; margin:4px 0 10px;">
+
+        <div style="font-size:14px; color:#6B7280; >
+          Click <strong>"Continue"</strong> to proceed to the secure payment page.
+        </div>
+
+      </div>
+    `,
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      createOrder();
+                    }
+                  });
+                }}
               />
 
               {/* <button onClick={createOrder} >Demo</button> */}

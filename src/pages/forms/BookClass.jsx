@@ -976,6 +976,9 @@ const BookClass = () => {
               return `The package you selected allows you to choose up to ${totalClasses} classes in total, with a maximum of ${maxPerWeek} per week.`;
             })()}
           </p>
+          <p className="text-xs text-[#7A7A7A] font-medium mb-2">
+          👇 Select a subject below to View available lesson slots
+        </p>
 
           {/* <div className="flex gap-2 mb-4"> */}
           <div className="grid grid-cols-2 gap-2 mb-4">
@@ -984,7 +987,7 @@ const BookClass = () => {
                 <button
                   key={subj}
                   onClick={() => handleSubjectClick(subj)}
-                  className={` w-full flex items-center gap-2 px-4 py-3 rounded-[8px] text-xs shadow font-medium ${
+                  className={` w-full flex items-center gap-2 px-4 py-3 rounded-[8px] text-xs shadow font-medium border-2 border-gray-400 ${
                     selectedSubject === subj
                       ? "text-white"
                       : "bg-white text-[#434343]"
@@ -1394,11 +1397,17 @@ const BookClass = () => {
                       >
                         {/* Tutor Image + Info */}
                         <div className="flex items-start gap-1">
-                          <img
-                            src={tutor.photo || "/tutor2.png"}
-                            alt={tutor.first_name}
-                            className="w-[73px] h-[73px] rounded-[4px] object-cover"
-                          />
+                          {tutor.photo ? (
+                  <img
+                    src={tutor.photo}
+                    alt={`${tutor.first_name ?? ""} ${tutor.last_name ?? ""}`.trim()}
+                    className="w-[73px] h-[73px] rounded-[4px] object-cover"
+                  />
+                ) : (
+                  <div className="w-[73px] h-[73px] rounded-[4px] bg-[#17215F] flex items-center justify-center text-white  text-[52px]">
+                    {`${tutor?.first_name?.charAt(0) ?? ""}${tutor?.last_name?.charAt(0) ?? ""}`.toUpperCase()}
+                  </div>
+                )}
 
                           <div className="flex-1">
                             <div className="flex justify-between mb-2">

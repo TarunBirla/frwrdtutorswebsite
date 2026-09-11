@@ -259,11 +259,17 @@ useEffect(() => {
                   className="bg-white rounded-xl p-4 mb-4 shadow"
                 >
                   <div className="flex items-start gap-4">
-                    <img
-                      src={tutor.photo || "/tutor2.png"}
-                      alt={tutor.first_name}
-                      className="w-[73px] h-[73px] rounded-[4px] object-cover"
-                    />
+                   {tutor.photo ? (
+                  <img
+                    src={tutor.photo}
+                    alt={`${tutor.first_name ?? ""} ${tutor.last_name ?? ""}`.trim()}
+                    className="w-[73px] h-[73px] rounded-[4px] object-cover"
+                  />
+                ) : (
+                  <div className="w-[73px] h-[73px] rounded-[4px] bg-[#17215F] flex items-center justify-center text-white  text-[52px]">
+                    {`${tutor?.first_name?.charAt(0) ?? ""}${tutor?.last_name?.charAt(0) ?? ""}`.toUpperCase()}
+                  </div>
+                )}
 
                     <div className="flex-1">
                       {/* Name and Details */}
